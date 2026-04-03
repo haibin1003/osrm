@@ -1,13 +1,17 @@
 # Ignore everything except OSRM projects and git files
 *
 !/.gitignore
+!/README.md
 !/osrm-backend/
 !/osrm-backend/**
 !/osrm-frontend/
 !/osrm-frontend/**
 !/osrm-mcp/
 !/osrm-mcp/**
-/osrm-deploy/
+!/osrm-deploy/
+!/osrm-deploy/**
+!/docs/
+!/docs/**
 
 # Build outputs
 **/dist/

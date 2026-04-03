@@ -1,0 +1,41 @@
+# Ignore everything except OSRM projects and git files
+*
+!/.gitignore
+!/osrm-backend/
+!/osrm-backend/**
+!/osrm-frontend/
+!/osrm-frontend/**
+!/osrm-mcp/
+!/osrm-mcp/**
+/osrm-deploy/
+
+# Build outputs
+**/dist/
+**/target/
+**/*.jar
+**/*.war
+
+# Dependencies
+**/node_modules/
+
+# IDE
+**/.idea/
+**/.vscode/
+**/*.iml
+
+# Logs
+**/*.log
+npm-debug.log*
+
+# Test artifacts
+**/test-results/
+**/playwright-report/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Misc
+**/.env
+**/.env.*
+**/*.local

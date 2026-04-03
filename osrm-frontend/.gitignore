@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+*.jar
+*.war
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Logs
+*.log
+npm-debug.log*
+
+# Test artifacts
+test-results/
+playwright-report/
+*.spec.ts
+debug-*.spec.ts
+menu-test.spec.ts
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Misc
+*.local
+.env
+.env.*

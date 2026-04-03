@@ -1,0 +1,54 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: osrm-backend
+
+  datasource:
+    url: jdbc:mysql://114.66.38.81:3306/osrm?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai&characterEncoding=UTF-8
+    username: root
+    password: root123
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQLDialect
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        connection:
+          charSet: UTF-8
+
+  sql:
+    init:
+      mode: never  # 使用 data-mysql.sql 初始化，而非 DataInitializer
+
+  data:
+    redis:
+      host: 114.66.38.81
+      port: 6379
+      password:
+      database: 0
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+
+jwt:
+  secret: osrm-secret-key-for-jwt-signing-at-least-256-bits-long-change-in-production
+  access-token-expiration: 7200000
+  refresh-token-expiration: 604800000
+
+osrm:
+  encryption:
+    key: dev-only-encryption-key-123456
+
+logging:
+  level:
+    com.osrm: DEBUG
+    org.springframework.security: DEBUG

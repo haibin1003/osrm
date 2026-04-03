@@ -1,0 +1,84 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: osrm-backend
+
+  datasource:
+    url: jdbc:mysql://114.66.38.81:3306/osrm?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false
+    username: ${MYSQL_USERNAME:osrm}
+    password: ${MYSQL_PASSWORD:osrm123}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      connection-init-sql: SET NAMES utf8mb4
+      maximum-pool-size: 20
+      minimum-idle: 5
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: false
+        connection:
+          charSet: utf8mb4
+    defer-datasource-initialization: true
+
+  sql:
+    init:
+      mode: never
+      encoding: UTF-8
+
+  # Redis configuration for production
+  data:
+    redis:
+      host: 114.66.38.81
+      port: 16379
+      password: ${REDIS_PASSWORD:}
+      database: 0
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+
+jwt:
+  secret: ${JWT_SECRET:osrm-secret-key-for-jwt-signing-at-least-256-bits-long-change-in-production}
+  access-token-expiration: 7200000
+  refresh-token-expiration: 604800000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        enabled: true
+
+logging:
+  level:
+    com.osrm: INFO
+    org.springframework.security: WARN
+  file:
+    name: logs/osrm-backend.log
+    max-size: 100MB
+    max-history: 30
+
+---
+# Docker profile with explicit host configuration
+spring:
+  config:
+    activate:
+      on-profile: docker
+  datasource:
+    url: jdbc:mysql://mysql:3306/osrm?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false
+  data:
+    redis:
+      host: redis

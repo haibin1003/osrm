@@ -1,0 +1,17 @@
+{
+  "name": "osrm-mcp",
+  "private": true,
+  "version": "1.0.0",
+  "description": "OSRM MCP Services for AI Agents",
+  "workspaces": [
+    "shared",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build -w shared && npm run build -w packages/portal && npm run build -w packages/api && npm run build -w packages/gateway",
+    "build:portal": "npm run build -w packages/portal",
+    "build:api": "npm run build -w packages/api",
+    "build:gateway": "npm run build -w packages/gateway",
+    "start:gateway": "node packages/gateway/dist/index.js"
+  }
+}

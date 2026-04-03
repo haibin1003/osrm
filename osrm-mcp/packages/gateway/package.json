@@ -1,0 +1,26 @@
+{
+  "name": "osrm-gateway",
+  "version": "1.0.0",
+  "description": "OSRM MCP Gateway - Single-port Streamable HTTP gateway for all MCP services",
+  "type": "module",
+  "main": "./dist/index.js",
+  "bin": {
+    "osrm-gateway": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "@osrm-mcp/shared": "*",
+    "osrm-portal": "*",
+    "osrm-api": "*",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "typescript": "^5.7.2"
+  }
+}

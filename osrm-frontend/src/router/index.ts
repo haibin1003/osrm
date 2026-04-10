@@ -105,6 +105,31 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/subscription/ApprovalHistory.vue'),
         meta: { title: '审批历史' }
       },
+      // 存量登记
+      {
+        path: 'inventory/my',
+        name: 'MyInventory',
+        component: () => import('@/views/inventory/MyInventory.vue'),
+        meta: { title: '我的存量', permissions: ['inventory:read'] }
+      },
+      {
+        path: 'inventory/create',
+        name: 'CreateInventory',
+        component: () => import('@/views/inventory/CreateInventory.vue'),
+        meta: { title: '存量登记', permissions: ['inventory:create'] }
+      },
+      {
+        path: 'inventory/pending',
+        name: 'PendingInventory',
+        component: () => import('@/views/inventory/PendingInventory.vue'),
+        meta: { title: '存量审批', permissions: ['inventory:approve'] }
+      },
+      {
+        path: 'inventory/manage',
+        name: 'InventoryManage',
+        component: () => import('@/views/inventory/InventoryManage.vue'),
+        meta: { title: '存量管理', permissions: ['inventory:manage'] }
+      },
       // 业务系统
       {
         path: 'business/systems',

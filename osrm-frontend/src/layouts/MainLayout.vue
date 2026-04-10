@@ -115,7 +115,7 @@ import {
   Box, ArrowDown, User, Setting, SwitchButton, Fold, Expand,
   HomeFilled, List, Plus, Collection, FolderOpened, CollectionTag,
   UserFilled, Edit, Timer, Clock, MapLocation, Key, Files,
-  ShoppingCart, OfficeBuilding, Tools, Moon, Sunny
+  ShoppingCart, OfficeBuilding, Tools, Moon, Sunny, Document
 } from '@element-plus/icons-vue'
 import { useTheme } from '@/composables/useTheme'
 
@@ -158,6 +158,18 @@ const menus = [
         { title: '申请订购', path: '/subscription/apply', permission: 'subscription:create' },
         { title: '待审批', path: '/subscription/pending', permission: 'subscription:approve' },
         { title: '审批历史', path: '/subscription/history', permission: 'subscription:read' }
+      ]}
+    ]
+  },
+  {
+    title: '存量登记', path: '/inventory', icon: 'Document',
+    permission: 'inventory:read',
+    children: [
+      { title: '', items: [
+        { title: '我的存量', path: '/inventory/my', permission: 'inventory:read' },
+        { title: '登记存量', path: '/inventory/create', permission: 'inventory:create' },
+        { title: '待审批', path: '/inventory/pending', permission: 'inventory:approve' },
+        { title: '存量管理', path: '/inventory/manage', permission: 'inventory:manage' }
       ]}
     ]
   },

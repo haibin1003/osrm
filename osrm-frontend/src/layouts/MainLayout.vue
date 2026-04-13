@@ -162,18 +162,6 @@ const menus = [
     ]
   },
   {
-    title: '存量登记', path: '/inventory', icon: 'Document',
-    permission: 'inventory:read',
-    children: [
-      { title: '', items: [
-        { title: '我的存量', path: '/inventory/my', permission: 'inventory:read' },
-        { title: '登记存量', path: '/inventory/create', permission: 'inventory:create' },
-        { title: '待审批', path: '/inventory/pending', permission: 'inventory:approve' },
-        { title: '存量管理', path: '/inventory/manage', permission: 'inventory:manage' }
-      ]}
-    ]
-  },
-  {
     title: '业务系统', path: '/business', icon: 'OfficeBuilding',
     permission: 'business-system:read',
     children: [

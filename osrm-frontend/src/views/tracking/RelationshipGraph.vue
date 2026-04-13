@@ -90,11 +90,20 @@
             <el-radio-button label="package">软件视图</el-radio-button>
           </el-radio-group>
           <el-button-group size="small">
-            <el-button @click="resetZoom">
-              <el-icon><FullScreen /></el-icon> 重置视图
+            <el-button @click="zoomIn" title="放大">
+              <el-icon><ZoomIn /></el-icon>
             </el-button>
-            <el-button @click="refreshGraph">
-              <el-icon><Refresh /></el-icon> 刷新
+            <el-button @click="zoomOut" title="缩小">
+              <el-icon><ZoomOut /></el-icon>
+            </el-button>
+            <el-button @click="resetZoom" title="重置视图">
+              <el-icon><FullScreen /></el-icon>
+            </el-button>
+            <el-button @click="toggleFullscreen" title="全屏">
+              <el-icon><FullScreenIcon /></el-icon>
+            </el-button>
+            <el-button @click="refreshGraph" title="刷新">
+              <el-icon><Refresh /></el-icon>
             </el-button>
           </el-button-group>
         </div>
@@ -113,7 +122,7 @@
         <div class="graph-hint">
           <el-tag size="small" type="info">
             <el-icon><InfoFilled /></el-icon>
-            提示：单击节点查看详情，双击聚焦，拖拽调整布局，滚轮缩放
+            提示：单击节点查看详情，双击聚焦，拖拽调整布局，滚轮缩放，橙色边为存量数据
           </el-tag>
         </div>
       </div>
@@ -267,16 +276,16 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed } from 'vue'
-import { Refresh, FullScreen, InfoFilled, Pointer } from '@element-plus/icons-vue'
+import { Refresh, FullScreen, InfoFilled, Pointer, ZoomIn, ZoomOut, FullScreen as FullScreenIcon } from '@element-plus/icons-vue'
 import { trackingApi, type RelationshipGraph, type SystemNode, type PackageNode, type GraphNode } from '@/api/tracking'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
 import { GraphChart } from 'echarts/charts'
-import { TitleComponent, TooltipComponent, LegendComponent } from 'echarts/components'
+import { TitleComponent, TooltipComponent, LegendComponent, DataZoomComponent } from 'echarts/components'
 import VChart from 'vue-echarts'
 
 // Register ECharts components
-use([CanvasRenderer, GraphChart, TitleComponent, TooltipComponent, LegendComponent])
+use([CanvasRenderer, GraphChart, TitleComponent, TooltipComponent, LegendComponent, DataZoomComponent])
 
 // Data
 const graphData = reactive<RelationshipGraph>({
@@ -329,6 +338,14 @@ const chartOption = computed(() => ({
       }
     }
   },
+  dataZoom: [
+    {
+      type: 'inside',
+      start: 0,
+      end: 100,
+      zoomLock: false
+    }
+  ],
   series: [{
     type: 'graph',
     layout: 'force',
@@ -350,7 +367,7 @@ const chartOption = computed(() => ({
     links: graphData.edges.map(edge => ({
       ...edge,
       lineStyle: {
-        color: '#ccc',
+        color: edge.sourceType === 'INVENTORY' ? '#e6a23c' : '#ccc',
         curveness: 0.1
       },
       label: {
@@ -362,7 +379,8 @@ const chartOption = computed(() => ({
     force: {
       repulsion: 300,
       edgeLength: [100, 200],
-      gravity: 0.1
+      gravity: 0.1,
+      layoutAnimation: true
     },
     emphasis: {
       focus: 'adjacency',
@@ -500,6 +518,31 @@ function resetZoom() {
   const chart = chartRef.value?.chart
   if (chart) {
     chart.dispatchAction({ type: 'restore' })
+  }
+}
+
+function zoomIn() {
+  const chart = chartRef.value?.chart
+  if (chart) {
+    chart.dispatchAction({ type: 'zoom', scale: 1.2 })
+  }
+}
+
+function zoomOut() {
+  const chart = chartRef.value?.chart
+  if (chart) {
+    chart.dispatchAction({ type: 'zoom', scale: 0.8 })
+  }
+}
+
+function toggleFullscreen() {
+  const elem = document.querySelector('.graph-container') as HTMLElement
+  if (!elem) return
+
+  if (!document.fullscreenElement) {
+    elem.requestFullscreen?.()
+  } else {
+    document.exitFullscreen?.()
   }
 }
 

@@ -25,13 +25,14 @@ export interface PackageNode extends GraphNode {
   status: string;
 }
 
-// 图谱边（订阅关系）
+// 图谱边（订阅关系/存量记录）
 export interface GraphEdge {
   id: string;
   source: string;  // node id
   target: string;  // node id
   versionNumber?: string;
   status?: string;
+  sourceType?: 'SUBSCRIPTION' | 'INVENTORY';  // 数据来源标记
 }
 
 // 图谱元数据

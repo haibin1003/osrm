@@ -26,7 +26,7 @@ public class SoftwareVersion {
     @Column(name = "status", nullable = false, length = 20)
     private VersionStatus status = VersionStatus.DRAFT;
 
-    @Column(name = "storage_backend_id", nullable = false)
+    @Column(name = "storage_backend_id")
     private Long storageBackendId;
 
     @Column(name = "storage_path", length = 512)

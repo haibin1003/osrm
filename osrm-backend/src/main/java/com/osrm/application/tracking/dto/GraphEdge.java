@@ -1,7 +1,7 @@
 package com.osrm.application.tracking.dto;
 
 /**
- * 图谱边（订阅关系）
+ * 图谱边（订阅关系/存量记录）
  */
 public class GraphEdge {
     private String id;
@@ -9,6 +9,7 @@ public class GraphEdge {
     private String target;  // node id
     private String versionNumber;
     private String status;
+    private String sourceType;  // SUBSCRIPTION 或 INVENTORY
 
     public GraphEdge() {}
 
@@ -18,6 +19,15 @@ public class GraphEdge {
         this.target = target;
         this.versionNumber = versionNumber;
         this.status = status;
+    }
+
+    public GraphEdge(String id, String source, String target, String versionNumber, String status, String sourceType) {
+        this.id = id;
+        this.source = source;
+        this.target = target;
+        this.versionNumber = versionNumber;
+        this.status = status;
+        this.sourceType = sourceType;
     }
 
     // Getters and Setters
@@ -31,4 +41,6 @@ public class GraphEdge {
     public void setVersionNumber(String versionNumber) { this.versionNumber = versionNumber; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+    public String getSourceType() { return sourceType; }
+    public void setSourceType(String sourceType) { this.sourceType = sourceType; }
 }

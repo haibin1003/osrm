@@ -84,7 +84,7 @@ public class BusinessSystemController {
     @PreAuthorize("hasAuthority('business-system:read')")
     public ApiResponse<List<String>> getDomains() {
         List<String> domains = businessSystemAppService.getAllDomains().stream()
-                .map(d -> d.name() + ":" + d.getName())
+                .map(d -> d.getCode() + ":" + d.getName())
                 .toList();
         return ApiResponse.success(domains);
     }

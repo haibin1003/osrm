@@ -45,6 +45,9 @@ public class InventoryDTO {
         dto.setSoftwareType(record.getSoftwareType());
         dto.setResponsiblePerson(record.getResponsiblePerson());
         dto.setBusinessSystemId(record.getBusinessSystemId());
+        if (record.getBusinessSystem() != null) {
+            dto.setBusinessSystemName(record.getBusinessSystem().getSystemName());
+        }
         dto.setDeployEnvironment(record.getDeployEnvironment());
         dto.setServerCount(record.getServerCount());
         dto.setUsageScenario(record.getUsageScenario());

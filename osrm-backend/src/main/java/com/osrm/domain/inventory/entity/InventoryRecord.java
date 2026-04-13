@@ -1,5 +1,6 @@
 package com.osrm.domain.inventory.entity;
 
+import com.osrm.domain.business.entity.BusinessSystem;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -41,6 +42,10 @@ public class InventoryRecord {
 
     @Column(name = "business_system_id")
     private Long businessSystemId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "business_system_id", insertable = false, updatable = false)
+    private BusinessSystem businessSystem;
 
     @Column(name = "deploy_environment", length = 32)
     private String deployEnvironment;
@@ -205,6 +210,10 @@ public class InventoryRecord {
 
     public void setBusinessSystemId(Long businessSystemId) {
         this.businessSystemId = businessSystemId;
+    }
+
+    public BusinessSystem getBusinessSystem() {
+        return businessSystem;
     }
 
     public String getDeployEnvironment() {

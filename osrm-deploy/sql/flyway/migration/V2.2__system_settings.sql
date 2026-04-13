@@ -28,3 +28,11 @@ INSERT INTO t_system_config (config_key, config_value, description, updated_at) 
 ON DUPLICATE KEY UPDATE
     config_value = '2.2',
     updated_at = NOW();
+
+-- =============================================================================
+-- 变更验证清单:
+-- [ ] ENABLE_INVENTORY_FEATURE 设置已插入
+-- [ ] INVENTORY_REQUIRE_APPROVAL 设置已插入
+-- [ ] INVENTORY_ALLOW_EDIT_PENDING 设置已插入
+-- [ ] schema_version 配置已更新为 2.2
+-- =============================================================================

@@ -78,3 +78,12 @@ WHERE r.role_code = 'ROLE_SYSTEM_ADMIN'
 ON DUPLICATE KEY UPDATE updated_at = NOW();
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+-- =============================================================================
+-- 变更验证清单:
+-- [ ] ROLE_PACKAGE_MANAGER 和 ROLE_VISITOR 角色已删除
+-- [ ] 原 PACKAGE_MANAGER 用户已迁移到 DEVELOPER 角色
+-- [ ] ROLE_DEVELOPER 权限已重新配置 (package:read, subscription:create, subscription:read)
+-- [ ] ROLE_SYSTEM_ADMIN 拥有全部权限
+-- [ ] 废弃权限已清理 (package:delete, business-system:approve, package:approve)
+-- =============================================================================

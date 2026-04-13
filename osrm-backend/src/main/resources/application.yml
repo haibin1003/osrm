@@ -13,7 +13,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: validate  # 仅验证，不自动修改Schema，由Flyway管理
+      ddl-auto: none  # 临时禁用，由Flyway管理
     database-platform: org.hibernate.dialect.MySQLDialect
     show-sql: true
     properties:
@@ -24,13 +24,13 @@ spring:
 
   # Flyway 数据库版本管理
   flyway:
-    enabled: true
+    enabled: false  # 临时禁用，避免V1脚本冲突
     # 基线脚本(V1)和增量脚本目录
     # 注意：需要在 osrm-backend 目录启动，或修改为此相对路径
     locations: filesystem:../osrm-deploy/sql/flyway/baseline,filesystem:../osrm-deploy/sql/flyway/migration
     baseline-on-migrate: true
     baseline-version: 1
-    validate-on-migrate: true
+    validate-on-migrate: false
     clean-disabled: true  # 生产环境禁止clean
 
   data:

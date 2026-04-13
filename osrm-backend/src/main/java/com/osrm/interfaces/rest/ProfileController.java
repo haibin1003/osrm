@@ -4,6 +4,7 @@ import com.osrm.application.user.dto.ProfileDTO;
 import com.osrm.application.user.dto.request.ChangePasswordRequest;
 import com.osrm.application.user.dto.request.UpdateProfileRequest;
 import com.osrm.application.user.service.ProfileAppService;
+import com.osrm.common.exception.BizException;
 import com.osrm.common.model.ApiResponse;
 import com.osrm.infrastructure.security.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
@@ -59,6 +60,6 @@ public class ProfileController {
             String token = bearerToken.substring(7);
             return jwtTokenProvider.getUserIdFromToken(token);
         }
-        throw new RuntimeException("无法获取当前用户");
+        throw new BizException("无法获取当前用户");
     }
 }

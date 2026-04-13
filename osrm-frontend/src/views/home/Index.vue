@@ -105,6 +105,10 @@
             <el-icon :size="36" color="var(--color-warning)"><Document /></el-icon>
             <span>存量登记</span>
           </div>
+          <div v-if="canViewMyInventory" class="action-item card-hover-lift" @click="$router.push('/inventory/my')">
+            <el-icon :size="36" color="var(--color-success)"><List /></el-icon>
+            <span>我的存量</span>
+          </div>
           <div class="action-item card-hover-lift" @click="$router.push('/portal')">
             <el-icon :size="36" color="var(--color-primary)"><View /></el-icon>
             <span>软件门户</span>
@@ -118,7 +122,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed } from 'vue'
 import { useAuthStore } from '@/stores/modules/auth'
-import { Plus, ShoppingCart, OfficeBuilding, Files, View, Box, Collection, DataLine, Star, Document } from '@element-plus/icons-vue'
+import { Plus, ShoppingCart, OfficeBuilding, Files, View, Box, Collection, DataLine, Star, Document, List } from '@element-plus/icons-vue'
 import { portalApi } from '@/api/portal'
 import type { SoftwarePackage } from '@/types/software'
 import type { PortalStats, StatsTrendItem } from '@/api/portal'
@@ -144,6 +148,7 @@ const canApplySubscription = computed(() => authStore.hasPermission('subscriptio
 const canViewBusinessSystem = computed(() => authStore.hasPermission('business-system:read'))
 const canViewStorage = computed(() => authStore.hasPermission('storage:read'))
 const canRegisterInventory = computed(() => authStore.hasPermission('inventory:create'))
+const canViewMyInventory = computed(() => authStore.hasPermission('inventory:read'))
 
 // Pie chart option
 const pieOption = computed(() => ({

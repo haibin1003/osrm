@@ -24,7 +24,7 @@ spring:
 
   # Flyway 数据库版本管理
   flyway:
-    enabled: false  # 临时禁用，避免V1脚本冲突
+    enabled: true  # 启用Flyway
     # 基线脚本(V1)和增量脚本目录
     # 注意：需要在 osrm-backend 目录启动，或修改为此相对路径
     locations: filesystem:../osrm-deploy/sql/flyway/baseline,filesystem:../osrm-deploy/sql/flyway/migration

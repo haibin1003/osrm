@@ -18,7 +18,7 @@ public class DownloadCommandGenerator {
             case MAVEN -> generateMavenCommand(packageName, version);
             case NPM -> generateNpmCommand(packageName, version);
             case PYPI -> generatePypiCommand(packageName, version);
-            case GENERIC -> generateGenericCommand(packageName, version);
+            case GENERIC, MIDDLEWARE, RUNTIME, MESSAGE_QUEUE -> generateGenericCommand(packageName, version);
         };
     }
 

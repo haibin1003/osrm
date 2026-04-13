@@ -9,7 +9,10 @@ public enum SoftwareType {
     MAVEN("Maven组件", "NEXUS"),
     NPM("NPM包", "NEXUS"),
     PYPI("PyPI包", "NEXUS"),
-    GENERIC("通用文件", "NAS");
+    GENERIC("通用文件", "NAS"),
+    MIDDLEWARE("中间件", "NAS"),
+    RUNTIME("运行时", "NAS"),
+    MESSAGE_QUEUE("消息队列", "NAS");
 
     private final String name;
     private final String storageType;

@@ -27,7 +27,7 @@ public class RelationshipGraphController {
      * 获取完整的系统-软件关联图
      */
     @GetMapping("/relationship-graph")
-    @PreAuthorize("hasAuthority('tracking:read')")
+    @PreAuthorize("hasAuthority('system:manage')")
     public ApiResponse<RelationshipGraphDTO> getRelationshipGraph(
             @RequestParam(required = false) String domain,
             @RequestParam(required = false) String softwareType,
@@ -39,7 +39,7 @@ public class RelationshipGraphController {
      * 获取系统依赖详情
      */
     @GetMapping("/system/{systemId}/dependencies")
-    @PreAuthorize("hasAuthority('tracking:read')")
+    @PreAuthorize("hasAuthority('system:manage')")
     public ApiResponse<SystemDependenciesDTO> getSystemDependencies(@PathVariable Long systemId) {
         return ApiResponse.success(graphAppService.getSystemDependencies(systemId));
     }
@@ -48,7 +48,7 @@ public class RelationshipGraphController {
      * 获取软件影响分析
      */
     @GetMapping("/package/{packageId}/impact")
-    @PreAuthorize("hasAuthority('tracking:read')")
+    @PreAuthorize("hasAuthority('system:manage')")
     public ApiResponse<PackageImpactDTO> getPackageImpact(@PathVariable Long packageId) {
         return ApiResponse.success(graphAppService.getPackageImpact(packageId));
     }

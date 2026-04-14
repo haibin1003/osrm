@@ -333,7 +333,28 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .storage-backend-page {
-  padding: 24px;
+  padding: var(--space-lg);
+  background: #f6f9fc;
+  min-height: 100vh;
+}
+
+/* Stripe gradient bar */
+.storage-backend-page::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(135deg, #635bff, #a259ff);
+  z-index: 1000;
+}
+
+/* Stripe white card */
+.stripe-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .page-header {
@@ -344,13 +365,14 @@ onMounted(() => {
 
   .page-title {
     font-size: 24px;
-    font-weight: 600;
+    font-weight: 300;
     color: #1f2937;
     margin: 0 0 4px;
   }
 
   .page-subtitle {
     font-size: 14px;
+    font-weight: 300;
     color: #6b7280;
     margin: 0;
   }
@@ -358,6 +380,7 @@ onMounted(() => {
 
 .filter-card {
   margin-bottom: 24px;
+  border-radius: 10px;
 
   :deep(.el-card__body) {
     padding: 16px 20px;
@@ -379,6 +402,8 @@ onMounted(() => {
 .storage-card {
   position: relative;
   transition: all 0.3s ease;
+  border-radius: 10px;
+  font-weight: 300;
 
   &.is-default {
     border: 1px solid #67c23a;
@@ -447,13 +472,14 @@ onMounted(() => {
 
     .backend-name {
       font-size: 16px;
-      font-weight: 600;
+      font-weight: 300;
       color: #1f2937;
       margin: 0 0 4px;
     }
 
     .backend-code {
       font-size: 12px;
+      font-weight: 300;
       color: #6b7280;
       margin: 0 0 8px;
       font-family: monospace;
@@ -461,6 +487,7 @@ onMounted(() => {
 
     .backend-endpoint {
       font-size: 13px;
+      font-weight: 300;
       color: #9ca3af;
       margin: 0;
       white-space: nowrap;
@@ -475,6 +502,31 @@ onMounted(() => {
     align-items: center;
     padding-top: 16px;
     border-top: 1px solid #e5e7eb;
+
+    .health-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+  }
+}
+
+/* Stripe status badge */
+.status-badge {
+  font-weight: 300;
+}
+
+.pagination-wrapper {
+  display: flex;
+  justify-content: flex-end;
+}
+</style> 1px solid #e5e7eb;
 
     .health-status {
       display: flex;

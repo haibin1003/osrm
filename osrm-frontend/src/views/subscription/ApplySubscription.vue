@@ -7,7 +7,7 @@
       </div>
     </div>
 
-    <el-card shadow="never" class="form-card">
+    <el-card class="stripe-card form-card">
       <el-form ref="formRef" :model="formData" :rules="formRules" label-width="120px">
         <el-form-item label="软件包" prop="packageId">
           <el-select v-model="formData.packageId" placeholder="请选择软件包" filterable style="width: 100%"
@@ -139,10 +139,42 @@ onMounted(async () => {
 
 <style scoped lang="scss">
 .apply-page {
-  .page-header { margin-bottom: var(--space-2xl);
-    .page-title { font-size: var(--font-size-4xl); font-weight: var(--font-weight-bold); margin: 0; }
-    .page-subtitle { font-size: var(--font-size-md); color: var(--color-text-secondary); margin: var(--space-xs) 0 0; }
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--space-xl);
+    .page-title {
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-light);
+      margin: 0;
+      color: var(--color-text-primary);
+      letter-spacing: -0.3px;
+    }
+    .page-subtitle {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+      margin: var(--space-xs) 0 0;
+      font-weight: var(--font-weight-light);
+    }
   }
-  .form-card { max-width: 700px; }
+
+  .stripe-card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(135deg, #635bff, #a259ff);
+    }
+  }
 }
 </style>

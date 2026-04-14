@@ -1,6 +1,6 @@
 <template>
   <div class="package-create">
-    <el-card shadow="never">
+    <el-card class="form-card" shadow="never">
       <template #header>
         <div class="card-header">
           <span class="title">新增软件包</span>
@@ -168,21 +168,43 @@ const handleCancel = () => {
 
 <style scoped lang="scss">
 .package-create {
-  .card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  background: #f6f9fc;
+  min-height: calc(100vh - 120px);
+  padding: var(--space-xl);
 
-    .title {
-      font-size: 16px;
-      font-weight: 600;
+  .form-card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(135deg, #635bff, #a259ff);
     }
-  }
 
-  .package-form {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px 0;
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .title {
+        font-size: var(--font-size-lg);
+        font-weight: var(--font-weight-light);
+      }
+    }
+
+    .package-form {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px 0;
+    }
   }
 }
 </style>

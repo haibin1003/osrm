@@ -1,7 +1,7 @@
 <template>
   <div class="role-management">
     <!-- 搜索栏 -->
-    <el-card class="search-card" shadow="never">
+    <div class="stripe-card search-card" shadow="never">
       <el-form :model="searchForm" inline>
         <el-form-item label="角色名称">
           <el-input v-model="searchForm.roleName" placeholder="请输入角色名称" clearable />
@@ -16,10 +16,10 @@
           <el-button @click="handleReset">重置</el-button>
         </el-form-item>
       </el-form>
-    </el-card>
+    </div>
 
     <!-- 操作栏 -->
-    <el-card class="table-card" shadow="never">
+    <div class="stripe-card table-card" shadow="never">
       <template #header>
         <div class="card-header">
           <span class="title">角色列表</span>
@@ -78,7 +78,7 @@
           @current-change="handlePageChange"
         />
       </div>
-    </el-card>
+    </div>
 
     <!-- 新增/编辑对话框 -->
     <el-dialog
@@ -398,31 +398,99 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .role-management {
+  padding: 24px;
+  background: #f6f9fc;
+  min-height: 100vh;
+
+  // Stripe top gradient bar
+  &::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(135deg, #635bff, #a259ff);
+    z-index: 1000;
+  }
+
+  // Override element-plus card styles
+  :deep(.el-card) {
+    border-radius: 10px;
+    border: none;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.03);
+  }
+
+  .stripe-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.03);
+  }
+
   .search-card {
-    margin-bottom: var(--space-md);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-xs);
+    margin-bottom: 16px;
 
     :deep(.el-card__body) {
       padding-bottom: 0;
     }
+
+    // Search form styles
+    :deep(.el-form-item__label) {
+      font-weight: 300;
+      color: #525f7f;
+    }
+
+    :deep(.el-input__inner) {
+      font-weight: 300;
+    }
   }
 
-  .card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  .table-card {
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
 
-    .title {
-      font-size: var(--font-size-lg);
-      font-weight: var(--font-weight-semibold);
-      color: var(--color-text-primary);
+      .title {
+        font-size: 16px;
+        font-weight: 300;
+        color: #32325d;
+      }
+    }
+
+    :deep(.el-table) {
+      font-weight: 300;
+      color: #525f7f;
+
+      th {
+        font-weight: 400;
+        color: #32325d;
+        background: #f6f9fc;
+      }
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 300;
+
+      &.status-active {
+        background: rgba(99, 91, 255, 0.1);
+        color: #635bff;
+      }
+
+      &.status-inactive {
+        background: rgba(108, 122, 136, 0.1);
+        color: #6c7a89;
+      }
     }
   }
 
   .pagination-wrapper {
-    margin-top: var(--space-md);
+    margin-top: 16px;
     display: flex;
     justify-content: flex-end;
   }

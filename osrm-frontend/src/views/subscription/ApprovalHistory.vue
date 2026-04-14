@@ -1,6 +1,13 @@
 <template>
   <div class="approval-history">
-    <el-card class="search-card" shadow="never">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">审批历史</h1>
+        <p class="page-subtitle">查看历史审批记录</p>
+      </div>
+    </div>
+
+    <div class="search-card">
       <el-form :model="searchForm" inline>
         <el-form-item label="软件名称">
           <el-input v-model="searchForm.softwareName" placeholder="请输入软件名称" clearable />
@@ -27,9 +34,9 @@
           <el-button @click="handleReset">重置</el-button>
         </el-form-item>
       </el-form>
-    </el-card>
+    </div>
 
-    <el-card class="table-card" shadow="never">
+    <div class="table-card stripe-card">
       <template #header>
         <div class="card-header">
           <span class="title">审批历史</span>
@@ -45,9 +52,9 @@
         <el-table-column prop="approvalTime" label="审批时间" min-width="150" />
         <el-table-column prop="result" label="审批结果" width="100">
           <template #default="{ row }">
-            <el-tag :type="row.result === 'approved' ? 'success' : 'danger'">
+            <span class="status-badge" :class="row.result === 'approved' ? 'success' : 'danger'">
               {{ row.result === 'approved' ? '已通过' : '已拒绝' }}
-            </el-tag>
+            </span>
           </template>
         </el-table-column>
         <el-table-column prop="comment" label="审批意见" min-width="200" show-overflow-tooltip />
@@ -71,8 +78,8 @@
           @current-change="handlePageChange"
         />
       </div>
-    </el-card>
-  </div>
+    </div>
+    </div>
 </template>
 
 <script setup lang="ts">
@@ -162,29 +169,68 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .approval-history {
-  .search-card {
-    margin-bottom: 16px;
-
-    :deep(.el-card__body) {
-      padding-bottom: 0;
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--space-xl);
+    .page-title {
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-light);
+      margin: 0;
+      color: var(--color-text-primary);
+      letter-spacing: -0.3px;
+    }
+    .page-subtitle {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+      margin: var(--space-xs) 0 0;
+      font-weight: var(--font-weight-light);
     }
   }
 
-  .card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  .stripe-card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    position: relative;
 
-    .title {
-      font-size: 16px;
-      font-weight: 600;
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(135deg, #635bff, #a259ff);
+    }
+  }
+
+  .search-card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(135deg, #635bff, #a259ff);
     }
   }
 
   .pagination-wrapper {
-    margin-top: 16px;
+    margin-top: var(--space-lg);
     display: flex;
     justify-content: flex-end;
+    padding: var(--space-md) var(--space-lg);
+    border-top: 1px solid var(--color-border-light);
   }
 }
 </style>

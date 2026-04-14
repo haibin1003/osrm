@@ -341,6 +341,27 @@ onMounted(() => {
 <style scoped lang="scss">
 .storage-edit-page {
   padding: var(--space-lg);
+  background: #f6f9fc;
+  min-height: 100vh;
+}
+
+/* Stripe gradient bar */
+.storage-edit-page::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(135deg, #635bff, #a259ff);
+  z-index: 1000;
+}
+
+/* Stripe white card */
+.stripe-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .page-header {
@@ -353,7 +374,7 @@ onMounted(() => {
 
     .page-title {
       font-size: var(--font-size-xl);
-      font-weight: var(--font-weight-bold);
+      font-weight: 300;
       color: var(--color-text-primary);
       margin: 0;
     }
@@ -366,9 +387,8 @@ onMounted(() => {
 
 .form-card {
   max-width: 800px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-xs);
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 
   :deep(.el-card__body) {
     padding: var(--space-xl);
@@ -376,8 +396,11 @@ onMounted(() => {
 }
 
 .storage-form {
+  font-weight: 300;
+
   .form-tip {
     font-size: var(--font-size-xs);
+    font-weight: 300;
     color: var(--color-text-tertiary);
     margin-top: var(--space-xs);
   }

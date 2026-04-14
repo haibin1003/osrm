@@ -1,60 +1,65 @@
 <template>
   <div class="my-inventory">
-    <el-card>
-      <template #header>
-        <div class="card-header">
-          <h2>我的存量登记</h2>
-          <el-button type="primary" @click="goToCreate">新增登记</el-button>
+    <div class="table-card stripe-card">
+      <div class="table-header">
+        <div class="header-content">
+          <h2 class="table-title">我的存量登记</h2>
+          <p class="table-subtitle">查看和管理我的存量软件登记记录</p>
         </div>
-      </template>
+        <el-button type="primary" @click="goToCreate">新增登记</el-button>
+      </div>
 
-      <el-form :model="queryForm" inline class="query-form">
-        <el-form-item label="状态">
-          <el-select v-model="queryForm.status" placeholder="全部状态" clearable>
-            <el-option label="待审批" value="PENDING" />
-            <el-option label="已批准" value="APPROVED" />
-            <el-option label="已驳回" value="REJECTED" />
-          </el-select>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="loadData">查询</el-button>
-          <el-button @click="resetQuery">重置</el-button>
-        </el-form-item>
-      </el-form>
+      <div class="query-form-wrapper">
+        <el-form :model="queryForm" inline class="query-form">
+          <el-form-item label="状态">
+            <el-select v-model="queryForm.status" placeholder="全部状态" clearable>
+              <el-option label="待审批" value="PENDING" />
+              <el-option label="已批准" value="APPROVED" />
+              <el-option label="已驳回" value="REJECTED" />
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="loadData">查询</el-button>
+            <el-button @click="resetQuery">重置</el-button>
+          </el-form-item>
+        </el-form>
+      </div>
 
-      <el-table :data="tableData" v-loading="loading" stripe>
-        <el-table-column prop="recordNo" label="登记编号" width="160" />
-        <el-table-column prop="packageName" label="软件名称" />
-        <el-table-column prop="versionNo" label="版本号" width="100" />
-        <el-table-column prop="businessSystemName" label="业务系统" width="120" />
-        <el-table-column prop="deployEnvironment" label="环境" width="80">
-          <template #default="{ row }">
-            <el-tag v-if="row.deployEnvironment === 'PRODUCTION'" type="danger">生产</el-tag>
-            <el-tag v-else-if="row.deployEnvironment === 'TESTING'" type="warning">测试</el-tag>
-            <el-tag v-else-if="row.deployEnvironment === 'DEVELOPMENT'" type="info">开发</el-tag>
-            <span v-else>-</span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="status" label="状态" width="100">
-          <template #default="{ row }">
-            <el-tag :type="getStatusType(row.status)">{{ row.statusName }}</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="createdAt" label="登记时间" width="160">
-          <template #default="{ row }">
-            {{ formatDate(row.createdAt) }}
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" width="150" fixed="right">
-          <template #default="{ row }">
-            <el-button type="primary" link @click="viewDetail(row)">查看</el-button>
-            <el-button v-if="row.status === 'PENDING'" type="primary" link @click="editRow(row)">编辑</el-button>
-            <el-button v-if="row.status === 'REJECTED'" type="danger" link @click="viewRejectReason(row)">驳回原因</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+      <div class="table-toolbar">
+        <el-table :data="tableData" v-loading="loading" stripe>
+          <el-table-column prop="recordNo" label="登记编号" width="160" />
+          <el-table-column prop="packageName" label="软件名称" />
+          <el-table-column prop="versionNo" label="版本号" width="100" />
+          <el-table-column prop="businessSystemName" label="业务系统" width="120" />
+          <el-table-column prop="deployEnvironment" label="环境" width="80">
+            <template #default="{ row }">
+              <el-tag v-if="row.deployEnvironment === 'PRODUCTION'" type="danger">生产</el-tag>
+              <el-tag v-else-if="row.deployEnvironment === 'TESTING'" type="warning">测试</el-tag>
+              <el-tag v-else-if="row.deployEnvironment === 'DEVELOPMENT'" type="info">开发</el-tag>
+              <span v-else>-</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="status" label="状态" width="100">
+            <template #default="{ row }">
+              <el-tag :type="getStatusType(row.status)">{{ row.statusName }}</el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column prop="createdAt" label="登记时间" width="160">
+            <template #default="{ row }">
+              {{ formatDate(row.createdAt) }}
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="150" fixed="right">
+            <template #default="{ row }">
+              <el-button type="primary" link @click="viewDetail(row)">查看</el-button>
+              <el-button v-if="row.status === 'PENDING'" type="primary" link @click="editRow(row)">编辑</el-button>
+              <el-button v-if="row.status === 'REJECTED'" type="danger" link @click="viewRejectReason(row)">驳回原因</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
 
-      <div class="pagination">
+      <div class="pagination-wrapper">
         <el-pagination
           v-model:current-page="queryForm.page"
           v-model:page-size="queryForm.size"
@@ -65,7 +70,7 @@
           @current-change="loadData"
         />
       </div>
-    </el-card>
+    </div>
 
     <!-- 详情对话框 -->
     <el-dialog v-model="detailVisible" title="存量登记详情" width="600px">
@@ -178,28 +183,67 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .my-inventory {
-  padding: 20px;
+  padding: var(--space-xl) 0;
+  max-width: 1280px;
+  margin: 0 auto;
 }
 
-.card-header {
+.table-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(135deg, #635bff, #a259ff);
+  }
+}
+
+.table-header {
+  padding: var(--space-xl) var(--space-2xl);
+  border-bottom: 1px solid var(--color-border-light);
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  .header-content {
+    .table-title {
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-primary);
+      margin: 0 0 var(--space-xs);
+    }
+
+    .table-subtitle {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+      margin: 0;
+      font-weight: var(--font-weight-light);
+    }
+  }
 }
 
-.card-header h2 {
-  margin: 0;
+.query-form-wrapper {
+  padding: var(--space-xl) var(--space-2xl) 0;
 }
 
-.query-form {
-  margin-bottom: 20px;
+.table-toolbar {
+  padding: var(--space-lg) var(--space-2xl);
 }
 
-.pagination {
-  margin-top: 20px;
+.pagination-wrapper {
+  padding: var(--space-lg) var(--space-2xl);
   display: flex;
   justify-content: flex-end;
+  border-top: 1px solid var(--color-border-light);
 }
 </style>

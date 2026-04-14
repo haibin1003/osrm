@@ -8,7 +8,7 @@
       <el-button type="primary" @click="showDialog('add')"><el-icon><Plus /></el-icon>新增分类</el-button>
     </div>
 
-    <el-card class="table-card" shadow="never">
+    <el-card class="table-card stripe-card" shadow="never">
       <el-table v-loading="loading" :data="treeData" row-key="id" default-expand-all stripe>
         <el-table-column prop="categoryName" label="分类名称" min-width="180" />
         <el-table-column prop="categoryCode" label="分类编码" width="160" />
@@ -142,9 +142,49 @@ onMounted(() => loadData())
 
 <style scoped lang="scss">
 .categories-page {
+  background: #f6f9fc;
+  min-height: calc(100vh - 120px);
+  padding: var(--space-xl);
+
   .page-header {
-    display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-2xl);
-    .page-title { font-size: var(--font-size-4xl); font-weight: var(--font-weight-bold); margin: 0; color: var(--color-text-primary); }
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--space-xl);
+    .page-title {
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-light);
+      margin: 0;
+      color: var(--color-text-primary);
+      letter-spacing: -0.3px;
+    }
+    .page-subtitle {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+      margin: var(--space-xs) 0 0;
+      font-weight: var(--font-weight-light);
+    }
+  }
+
+  .table-card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(135deg, #635bff, #a259ff);
+    }
+  }
+}
+</style>-weight: var(--font-weight-bold); margin: 0; color: var(--color-text-primary); }
     .page-subtitle { font-size: var(--font-size-md); color: var(--color-text-secondary); margin: var(--space-xs) 0 0; }
   }
 }

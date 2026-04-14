@@ -1,12 +1,10 @@
 <template>
   <div class="inventory-create">
-    <el-card class="create-card">
-      <template #header>
-        <div class="card-header">
-          <h2>存量软件登记</h2>
-          <el-text type="info">登记存量系统已使用的开源软件</el-text>
-        </div>
-      </template>
+    <div class="form-card stripe-card">
+      <div class="form-header">
+        <h2 class="form-title">存量软件登记</h2>
+        <p class="form-subtitle">登记存量系统已使用的开源软件</p>
+      </div>
 
       <el-form
         ref="formRef"
@@ -37,7 +35,7 @@
               :value="pkg.id"
             />
           </el-select>
-          <el-text type="info" size="small">如软件已在系统中，可选择关联</el-text>
+          <div class="form-tip">如软件已在系统中，可选择关联</div>
         </el-form-item>
 
         <el-form-item label="版本号">
@@ -121,7 +119,7 @@
           <el-button @click="goBack">返回</el-button>
         </el-form-item>
       </el-form>
-    </el-card>
+    </div>
   </div>
 </template>
 
@@ -212,27 +210,58 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .inventory-create {
-  padding: 20px;
-}
-
-.create-card {
+  padding: var(--space-xl) 0;
   max-width: 800px;
   margin: 0 auto;
 }
 
-.card-header {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.form-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(135deg, #635bff, #a259ff);
+  }
 }
 
-.card-header h2 {
-  margin: 0;
+.form-header {
+  padding: var(--space-xl) var(--space-2xl);
+  border-bottom: 1px solid var(--color-border-light);
+
+  .form-title {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
+    margin: 0 0 var(--space-xs);
+  }
+
+  .form-subtitle {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    margin: 0;
+    font-weight: var(--font-weight-light);
+  }
 }
 
 .inventory-form {
-  padding: 20px 0;
+  padding: var(--space-xl) var(--space-2xl);
+}
+
+.form-tip {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  margin-top: var(--space-xs);
+  font-weight: var(--font-weight-normal);
 }
 </style>

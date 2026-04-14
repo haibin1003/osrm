@@ -3,7 +3,7 @@
     <div class="login-card">
       <div class="login-header">
         <div class="logo-icon">
-          <el-icon :size="24"><Box /></el-icon>
+          <el-icon :size="22"><Box /></el-icon>
         </div>
         <h1 class="logo-text">OSRM</h1>
         <p class="logo-sub">开源软件仓库管理系统</p>
@@ -49,7 +49,7 @@
           :loading="loading"
           @click="handleLogin"
         >
-          登 录
+          登录
         </el-button>
       </el-form>
 
@@ -120,70 +120,108 @@ const handleLogin = async () => {
 
 .login-card {
   width: 400px;
-  padding: var(--space-4xl) var(--space-3xl);
+  padding: var(--space-3xl) var(--space-2xl);
   background: var(--color-bg-card);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-sm);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
 }
 
 .login-header {
   text-align: center;
-  margin-bottom: var(--space-xl);
+  margin-bottom: var(--space-2xl);
 }
 
 .logo-icon {
-  width: 40px;
-  height: 40px;
-  background: var(--color-primary);
-  border-radius: var(--radius-lg);
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #635bff, #a259ff);
+  border-radius: var(--radius-md);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   color: white;
-  margin-bottom: var(--space-xs);
+  margin-bottom: var(--space-md);
+  box-shadow: 0 4px 12px rgba(99, 91, 255, 0.3);
 }
 
 .logo-text {
-  font-size: var(--font-size-2xl);
-  font-weight: var(--font-weight-bold);
+  font-size: 22px;
+  font-weight: var(--font-weight-light);
   color: var(--color-text-primary);
   margin: 0 0 var(--space-xs);
-  letter-spacing: -0.5px;
+  letter-spacing: -0.3px;
 }
 
 .logo-sub {
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   margin: 0;
+  font-weight: var(--font-weight-light);
 }
 
 .login-form {
   :deep(.el-input__wrapper) {
-    padding: var(--space-xs) var(--space-lg);
+    padding: var(--space-xs) var(--space-md);
+    background: #f6f9fc;
+    border-radius: var(--radius-md);
+    box-shadow: 0 0 0 1px var(--color-border) inset;
+    transition: all var(--transition-fast);
+
+    &:hover {
+      box-shadow: 0 0 0 1px #c5cfd9 inset;
+    }
+
+    &.is-focus {
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(99, 91, 255, 0.1) inset;
+    }
   }
 
   :deep(.el-input__inner) {
-    height: 42px;
-    font-size: var(--font-size-lg);
+    height: 40px;
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-light);
   }
 }
 
 .form-options {
   margin-bottom: var(--space-xl);
+
+  :deep(.el-checkbox__label) {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    font-weight: var(--font-weight-normal);
+  }
+
+  :deep(.el-checkbox__input.is-checked .el-checkbox__inner) {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+  }
 }
 
 .login-btn {
   width: 100%;
-  height: 44px;
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
+  height: 42px;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  background: linear-gradient(135deg, #635bff, #7c6fff);
+  border: none;
+  border-radius: var(--radius-md);
+  box-shadow: 0 2px 8px rgba(99, 91, 255, 0.25);
+  transition: all var(--transition-base);
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(99, 91, 255, 0.35);
+  }
 }
 
 .login-footer {
   text-align: center;
   color: var(--color-text-tertiary);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   margin: var(--space-2xl) 0 0;
+  font-weight: var(--font-weight-normal);
 }
 </style>

@@ -11,13 +11,13 @@
     </div>
 
     <!-- 搜索 -->
-    <el-card class="search-card" shadow="never">
+    <div class="search-card stripe-card">
       <el-form :model="searchForm" inline>
         <el-form-item label="关键词">
-          <el-input v-model="searchForm.keyword" placeholder="系统编码/名称" clearable style="width: 200px" />
+          <el-input v-model="searchForm.keyword" placeholder="系统编码/名称" clearable />
         </el-form-item>
         <el-form-item label="所属域">
-          <el-select v-model="searchForm.domain" placeholder="全部" clearable style="width: 140px">
+          <el-select v-model="searchForm.domain" placeholder="全部" clearable>
             <el-option label="业务域" value="BUSINESS" />
             <el-option label="运营域" value="OPERATION" />
             <el-option label="资源域" value="RESOURCE" />
@@ -26,7 +26,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="状态">
-          <el-select v-model="searchForm.enabled" placeholder="全部" clearable style="width: 100px">
+          <el-select v-model="searchForm.enabled" placeholder="全部" clearable>
             <el-option label="启用" :value="true" />
             <el-option label="停用" :value="false" />
           </el-select>
@@ -36,11 +36,11 @@
           <el-button @click="handleReset">重置</el-button>
         </el-form-item>
       </el-form>
-    </el-card>
+    </div>
 
     <!-- 表格 -->
-    <el-card class="table-card" shadow="never">
-      <el-table v-loading="loading" :data="tableData" stripe>
+    <div class="table-card stripe-card">
+      <el-table v-loading="loading" :data="tableData">
         <el-table-column prop="systemCode" label="系统编码" min-width="120" />
         <el-table-column prop="systemName" label="系统名称" min-width="150" />
         <el-table-column prop="domainName" label="所属域" width="100">
@@ -51,9 +51,7 @@
         <el-table-column prop="responsiblePerson" label="负责人" width="120" />
         <el-table-column prop="enabled" label="状态" width="80" align="center">
           <template #default="{ row }">
-            <el-tag :type="row.enabled ? 'success' : 'info'" size="small">
-              {{ row.enabled ? '启用' : '停用' }}
-            </el-tag>
+            <span class="status-badge" :class="row.enabled ? 'success' : ''">{{ row.enabled ? '启用' : '停用' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="createdAt" label="创建时间" width="170" />
@@ -83,7 +81,7 @@
           @current-change="loadData"
         />
       </div>
-    </el-card>
+    </div>
 
     <!-- 新增/编辑对话框 -->
     <el-dialog
@@ -125,12 +123,12 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import { Plus, Search } from '@element-plus/icons-vue'
 import { businessApi } from '@/api/business'
 import { useAuthStore } from '@/stores/modules/auth'
-import type { BusinessSystem, BusinessSystemForm, BusinessDomain } from '@/types/business'
+import type { BusinessSystem, BusinessSystemForm } from '@/types/business'
 
 const authStore = useAuthStore()
 
@@ -152,7 +150,7 @@ const pagination = reactive({ page: 1, size: 10, total: 0 })
 const formData = reactive<BusinessSystemForm>({ systemCode: '', systemName: '', domain: 'BUSINESS', responsiblePerson: '', description: '' })
 
 const formRules: FormRules = {
-  systemCode: [{ required: true, message: '请输入系统编码', trigger: 'blur' }, { pattern: /^[a-zA-Z0-9_-]+$/, message: '只支持字母、数字、下划线和连字符', trigger: 'blur' }],
+  systemCode: [{ required: true, message: '请输入系统编码', trigger: 'blur' }, { pattern: /^[a-zA-Z0-9_-]+$/, message: '只支持字母、数字，下划线和连字符', trigger: 'blur' }],
   systemName: [{ required: true, message: '请输入系统名称', trigger: 'blur' }],
   domain: [{ required: true, message: '请选择所属域', trigger: 'change' }]
 }
@@ -237,19 +235,71 @@ onMounted(() => loadData())
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: var(--space-2xl);
+    margin-bottom: var(--space-xl);
 
-    .page-title { font-size: var(--font-size-4xl); font-weight: var(--font-weight-bold); margin: 0; color: var(--color-text-primary); }
-    .page-subtitle { font-size: var(--font-size-md); color: var(--color-text-secondary); margin: var(--space-xs) 0 0; }
+    .page-title {
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-light);
+      margin: 0;
+      color: var(--color-text-primary);
+      letter-spacing: -0.3px;
+    }
+    .page-subtitle {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+      margin: var(--space-xs) 0 0;
+      font-weight: var(--font-weight-light);
+    }
   }
 
   .search-card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    position: relative;
     margin-bottom: var(--space-lg);
-    :deep(.el-card__body) { padding-bottom: 0; }
+    padding: var(--space-lg);
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(135deg, #635bff, #a259ff);
+    }
+
+    :deep(.el-form-item) {
+      margin-bottom: 0;
+    }
   }
 
-  .table-card { margin-bottom: var(--space-lg); }
+  .table-card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    position: relative;
 
-  .pagination-wrapper { margin-top: var(--space-lg); display: flex; justify-content: flex-end; }
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(135deg, #635bff, #a259ff);
+    }
+  }
+
+  .pagination-wrapper {
+    margin-top: var(--space-lg);
+    display: flex;
+    justify-content: flex-end;
+    padding: var(--space-md) var(--space-lg);
+    border-top: 1px solid var(--color-border-light);
+  }
 }
 </style>

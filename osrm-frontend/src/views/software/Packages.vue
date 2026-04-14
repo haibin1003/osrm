@@ -8,14 +8,14 @@
       <el-button v-if="canCreate" type="primary" @click="showCreateDialog"><el-icon><Plus /></el-icon>新增软件包</el-button>
     </div>
 
-    <!-- 搜索 -->
-    <el-card class="search-card" shadow="never">
+    <!-- 搜索 (Stripe style card) -->
+    <div class="search-card stripe-card">
       <el-form :model="searchForm" inline>
         <el-form-item label="关键词">
-          <el-input v-model="searchForm.keyword" placeholder="包名/包标识" clearable style="width: 200px" />
+          <el-input v-model="searchForm.keyword" placeholder="包名/包标识" clearable />
         </el-form-item>
         <el-form-item label="类型">
-          <el-select v-model="searchForm.type" placeholder="全部" clearable style="width: 140px">
+          <el-select v-model="searchForm.type" placeholder="全部" clearable>
             <el-option label="Docker 镜像" value="DOCKER_IMAGE" />
             <el-option label="Helm Chart" value="HELM_CHART" />
             <el-option label="Maven" value="MAVEN" />
@@ -25,7 +25,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="状态">
-          <el-select v-model="searchForm.status" placeholder="全部" clearable style="width: 110px">
+          <el-select v-model="searchForm.status" placeholder="全部" clearable>
             <el-option label="草稿" value="DRAFT" />
             <el-option label="待审核" value="PENDING" />
             <el-option label="已发布" value="PUBLISHED" />
@@ -37,15 +37,15 @@
           <el-button @click="handleReset">重置</el-button>
         </el-form-item>
       </el-form>
-    </el-card>
+    </div>
 
     <!-- 表格 -->
-    <el-card class="table-card" shadow="never">
-      <el-table v-loading="loading" :data="tableData" stripe>
+    <div class="table-card stripe-card">
+      <el-table v-loading="loading" :data="tableData">
         <el-table-column prop="packageName" label="包名" min-width="150" />
         <el-table-column prop="packageKey" label="包标识" min-width="150" />
         <el-table-column prop="softwareTypeName" label="类型" width="110">
-          <template #default="{ row }"><el-tag size="small" type="info">{{ row.softwareTypeName }}</el-tag></template>
+          <template #default="{ row }"><el-tag size="small">{{ row.softwareTypeName }}</el-tag></template>
         </el-table-column>
         <el-table-column prop="currentVersion" label="当前版本" width="110">
           <template #default="{ row }"><span>{{ row.currentVersion || '-' }}</span></template>
@@ -53,7 +53,7 @@
         <el-table-column prop="versionCount" label="版本数" width="80" align="center" />
         <el-table-column prop="statusName" label="状态" width="90" align="center">
           <template #default="{ row }">
-            <el-tag :type="statusType(row.status)" size="small">{{ row.statusName }}</el-tag>
+            <span class="status-badge" :class="statusClass(row.status)">{{ row.statusName }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="createdAt" label="创建时间" width="170" />
@@ -79,7 +79,7 @@
           :total="pagination.total" :page-sizes="[10, 20, 50]" layout="total, sizes, prev, pager, next"
           @size-change="loadData" @current-change="loadData" />
       </div>
-    </el-card>
+    </div>
 
     <!-- 新增软件包弹窗 -->
     <el-dialog v-model="createDialogVisible" title="新增软件包" width="550px" @close="resetCreateForm">
@@ -89,7 +89,7 @@
         </el-form-item>
         <el-form-item label="包标识" prop="packageKey">
           <el-input v-model="createForm.packageKey" placeholder="如：my-app（英文唯一标识）" />
-          <div style="font-size: 12px; color: #999; margin-top: 4px;">用于系统唯一标识，只允许字母、数字、连字符</div>
+          <div class="form-tip">用于系统唯一标识，只允许字母、数字、连字符</div>
         </el-form-item>
         <el-form-item label="类型" prop="softwareType">
           <el-select v-model="createForm.softwareType" placeholder="请选择" style="width: 100%">
@@ -113,12 +113,12 @@
 
     <!-- 版本管理弹窗 -->
     <el-dialog v-model="versionDialogVisible" :title="`版本管理 - ${currentPackageName}`" width="700px">
-      <div style="margin-bottom: 16px;">
+      <div style="margin-bottom: var(--space-md);">
         <el-button type="primary" size="small" @click="showAddVersion = !showAddVersion">
           {{ showAddVersion ? '收起' : '添加版本' }}
         </el-button>
       </div>
-      <el-form v-if="showAddVersion" ref="versionFormRef" :model="versionForm" :rules="versionRules" label-width="100px" style="margin-bottom: 16px; background: #f5f7fa; padding: 16px; border-radius: 4px;">
+      <el-form v-if="showAddVersion" ref="versionFormRef" :model="versionForm" :rules="versionRules" label-width="100px" class="version-form">
         <el-form-item label="版本号" prop="versionNo">
           <el-input v-model="versionForm.versionNo" placeholder="如：1.0.0" style="width: 200px" />
         </el-form-item>
@@ -135,11 +135,11 @@
           <el-button size="small" @click="showAddVersion = false">取消</el-button>
         </el-form-item>
       </el-form>
-      <el-table :data="versionList" stripe size="small">
+      <el-table :data="versionList" size="small">
         <el-table-column prop="versionNo" label="版本号" width="120" />
         <el-table-column prop="statusName" label="状态" width="90">
           <template #default="{ row }">
-            <el-tag :type="versionStatusType(row.status)" size="small">{{ row.statusName }}</el-tag>
+            <el-tag size="small">{{ row.statusName }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="isLatest" label="最新" width="60" align="center">
@@ -154,7 +154,7 @@
         <el-table-column label="制品路径" min-width="160" show-overflow-tooltip>
           <template #default="{ row }">
             <span v-if="row.storagePath" class="artifact-path">{{ row.storagePath }}</span>
-            <span v-else style="color: #999">未上传</span>
+            <span v-else class="text-muted">未上传</span>
           </template>
         </el-table-column>
         <el-table-column prop="createdAt" label="创建时间" width="160" />
@@ -179,7 +179,7 @@
         <el-descriptions-item label="MD5">{{ uploadResult.md5Hash || '-' }}</el-descriptions-item>
         <el-descriptions-item v-if="uploadResult.downloadCommand" label="下载/使用命令">
           <div style="display: flex; align-items: center; gap: 8px;">
-            <code style="flex: 1; word-break: break-all; font-size: 12px; background: #f5f7fa; padding: 4px 8px; border-radius: 4px;">{{ uploadResult.downloadCommand }}</code>
+            <code class="code-block">{{ uploadResult.downloadCommand }}</code>
             <el-button size="small" type="primary" link @click="copyText(uploadResult.downloadCommand)">复制</el-button>
           </div>
         </el-descriptions-item>
@@ -310,8 +310,7 @@ const offlineDialogVisible = ref(false)
 const offlineReason = ref('')
 const offlineTarget = ref<SoftwarePackage | null>(null)
 
-const statusType = (s: string) => ({ DRAFT: 'info', PENDING: 'warning', PUBLISHED: 'success', OFFLINE: 'danger', ARCHIVED: 'info' }[s] || 'info')
-const versionStatusType = (s: string) => ({ DRAFT: 'info', PUBLISHED: 'success', OFFLINE: 'danger' }[s] || 'info')
+const statusClass = (s: string) => ({ DRAFT: '', PENDING: 'warning', PUBLISHED: 'success', OFFLINE: 'danger', ARCHIVED: '' }[s] || '')
 
 const loadData = async () => {
   loading.value = true
@@ -472,12 +471,101 @@ onMounted(async () => {
 
 <style scoped lang="scss">
 .packages-page {
-  .page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-2xl);
-    .page-title { font-size: var(--font-size-4xl); font-weight: var(--font-weight-bold); margin: 0; color: var(--color-text-primary); }
-    .page-subtitle { font-size: var(--font-size-md); color: var(--color-text-secondary); margin: var(--space-xs) 0 0; }
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--space-xl);
+    .page-title {
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-light);
+      margin: 0;
+      color: var(--color-text-primary);
+      letter-spacing: -0.3px;
+    }
+    .page-subtitle {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+      margin: var(--space-xs) 0 0;
+      font-weight: var(--font-weight-light);
+    }
   }
-  .search-card { margin-bottom: var(--space-lg); :deep(.el-card__body) { padding-bottom: 0; } }
-  .pagination-wrapper { margin-top: var(--space-lg); display: flex; justify-content: flex-end; }
-  .artifact-path { font-family: var(--font-mono); font-size: 12px; color: var(--color-text-secondary); }
+
+  .search-card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    position: relative;
+    margin-bottom: var(--space-lg);
+    padding: var(--space-lg);
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(135deg, #635bff, #a259ff);
+    }
+
+    :deep(.el-form-item) {
+      margin-bottom: 0;
+    }
+
+    :deep(.el-select) {
+      width: 140px;
+    }
+  }
+
+  .table-card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(135deg, #635bff, #a259ff);
+    }
+  }
+
+  .pagination-wrapper {
+    margin-top: var(--space-lg);
+    display: flex;
+    justify-content: flex-end;
+    padding: var(--space-md) var(--space-lg);
+    border-top: 1px solid var(--color-border-light);
+  }
+
+  .artifact-path {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-text-secondary);
+  }
+
+  .version-form {
+    background: var(--color-bg-page);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    margin-bottom: var(--space-md);
+  }
+
+  .code-block {
+    flex: 1;
+    word-break: break-all;
+    font-size: 12px;
+    background: var(--color-bg-page);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+  }
 }
 </style>

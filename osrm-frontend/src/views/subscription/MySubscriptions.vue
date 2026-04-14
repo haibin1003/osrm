@@ -8,15 +8,15 @@
       <el-button type="primary" @click="$router.push('/subscription/apply')"><el-icon><Plus /></el-icon>申请订购</el-button>
     </div>
 
-    <el-card shadow="never">
-      <el-table v-loading="loading" :data="tableData" stripe>
+    <div class="table-card stripe-card">
+      <el-table v-loading="loading" :data="tableData">
         <el-table-column prop="packageName" label="软件包" min-width="150" />
         <el-table-column prop="versionNumber" label="版本" width="100" />
         <el-table-column prop="systemName" label="业务系统" width="150" />
         <el-table-column prop="useScene" label="使用场景" min-width="150" show-overflow-tooltip />
         <el-table-column prop="statusName" label="状态" width="90" align="center">
           <template #default="{ row }">
-            <el-tag :type="statusType(row.status)" size="small">{{ row.statusName }}</el-tag>
+            <span class="status-badge" :class="statusClass(row.status)">{{ row.statusName }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="createdAt" label="申请时间" width="170" />
@@ -30,13 +30,15 @@
         <el-pagination v-model:current-page="page" v-model:page-size="size" :total="total"
           :page-sizes="[10, 20]" layout="total, sizes, prev, pager, next" @change="loadData" />
       </div>
-    </el-card>
+    </div>
 
     <el-dialog v-model="tokenDialogVisible" title="下载令牌" width="500px">
       <div v-if="tokenData">
-        <p><strong>令牌：</strong><code>{{ tokenData.token }}</code></p>
-        <p><strong>过期时间：</strong>{{ tokenData.expireAt }}</p>
-        <p><strong>下载次数：</strong>{{ tokenData.usedCount }} / {{ tokenData.maxDownloads }}</p>
+        <el-descriptions :column="1" border>
+          <el-descriptions-item label="令牌"><code class="token-code">{{ tokenData.token }}</code></el-descriptions-item>
+          <el-descriptions-item label="过期时间">{{ tokenData.expireAt }}</el-descriptions-item>
+          <el-descriptions-item label="下载次数">{{ tokenData.usedCount }} / {{ tokenData.maxDownloads }}</el-descriptions-item>
+        </el-descriptions>
       </div>
     </el-dialog>
   </div>
@@ -57,7 +59,7 @@ const total = ref(0)
 const tokenDialogVisible = ref(false)
 const tokenData = ref<DownloadTokenDTO | null>(null)
 
-const statusType = (s: string) => ({ PENDING: 'warning', APPROVED: 'success', REJECTED: 'danger', REVOKED: 'info' }[s] || 'info')
+const statusClass = (s: string) => ({ PENDING: 'warning', APPROVED: 'success', REJECTED: 'danger', REVOKED: '' }[s] || '')
 
 const loadData = async () => {
   loading.value = true
@@ -80,10 +82,59 @@ onMounted(() => loadData())
 
 <style scoped lang="scss">
 .my-subs-page {
-  .page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-2xl);
-    .page-title { font-size: var(--font-size-4xl); font-weight: var(--font-weight-bold); margin: 0; }
-    .page-subtitle { font-size: var(--font-size-md); color: var(--color-text-secondary); margin: var(--space-xs) 0 0; }
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--space-xl);
+    .page-title {
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-light);
+      margin: 0;
+      color: var(--color-text-primary);
+      letter-spacing: -0.3px;
+    }
+    .page-subtitle {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+      margin: var(--space-xs) 0 0;
+      font-weight: var(--font-weight-light);
+    }
   }
-  .pagination-wrapper { margin-top: var(--space-lg); display: flex; justify-content: flex-end; }
+
+  .table-card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(135deg, #635bff, #a259ff);
+    }
+  }
+
+  .pagination-wrapper {
+    margin-top: var(--space-lg);
+    display: flex;
+    justify-content: flex-end;
+    padding: var(--space-md) var(--space-lg);
+    border-top: 1px solid var(--color-border-light);
+  }
+
+  .token-code {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    background: var(--color-bg-page);
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    word-break: break-all;
+  }
 }
 </style>

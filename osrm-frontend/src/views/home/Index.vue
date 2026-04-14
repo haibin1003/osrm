@@ -5,32 +5,32 @@
       <p class="page-subtitle">开源软件仓库管理系统</p>
     </div>
 
-    <!-- 统计卡片 - 4列 -->
+    <!-- 统计卡片 - 4列 (Stripe style with gradient top) -->
     <div class="stats-grid">
-      <div class="stat-card card-hover-lift">
-        <div class="stat-icon" style="background: var(--color-primary-light); color: var(--color-primary);">
-          <el-icon :size="28"><Box /></el-icon>
+      <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, rgba(99, 91, 255, 0.1), rgba(162, 89, 255, 0.1));">
+          <el-icon :size="24" color="#635bff"><Box /></el-icon>
         </div>
         <div class="stat-value">{{ stats.totalPackages }}</div>
         <div class="stat-label">软件包总数</div>
       </div>
-      <div class="stat-card card-hover-lift">
-        <div class="stat-icon" style="background: var(--color-success-light); color: var(--color-success);">
-          <el-icon :size="28"><Collection /></el-icon>
+      <div class="stat-card">
+        <div class="stat-icon" style="background: rgba(36, 180, 126, 0.1);">
+          <el-icon :size="24" color="#24b47e"><Collection /></el-icon>
         </div>
         <div class="stat-value">{{ Object.keys(stats.totalByType).length }}</div>
         <div class="stat-label">软件类型</div>
       </div>
-      <div class="stat-card card-hover-lift">
-        <div class="stat-icon" style="background: var(--color-warning-light); color: var(--color-warning);">
-          <el-icon :size="28"><DataLine /></el-icon>
+      <div class="stat-card">
+        <div class="stat-icon" style="background: rgba(217, 119, 6, 0.1);">
+          <el-icon :size="24" color="#d97706"><DataLine /></el-icon>
         </div>
         <div class="stat-value">{{ overview.totalSubscriptions }}</div>
         <div class="stat-label">订购总数</div>
       </div>
-      <div class="stat-card card-hover-lift">
-        <div class="stat-icon" style="background: var(--color-info-light); color: var(--color-info);">
-          <el-icon :size="28"><Star /></el-icon>
+      <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, rgba(99, 91, 255, 0.1), rgba(162, 89, 255, 0.1));">
+          <el-icon :size="24" color="#635bff"><Star /></el-icon>
         </div>
         <div class="stat-value">{{ popular.length }}</div>
         <div class="stat-label">热门软件</div>
@@ -39,82 +39,94 @@
 
     <!-- 图表区域 -->
     <div class="charts-row">
-      <el-card shadow="never" class="chart-card">
-        <template #header>
-          <div class="card-header-title">软件类型分布</div>
-        </template>
+      <div class="chart-card stripe-card">
+        <div class="chart-header">
+          <span class="chart-title">软件类型分布</span>
+        </div>
         <v-chart class="chart" :option="pieOption" autoresize />
-      </el-card>
+      </div>
 
-      <el-card shadow="never" class="chart-card">
-        <template #header>
-          <div class="card-header-title">近7天订购趋势</div>
-        </template>
+      <div class="chart-card stripe-card">
+        <div class="chart-header">
+          <span class="chart-title">近7天订购趋势</span>
+        </div>
         <v-chart class="chart" :option="lineOption" autoresize />
-      </el-card>
+      </div>
     </div>
 
     <!-- 最近发布 + 快捷操作 -->
     <div class="bottom-row">
-      <el-card shadow="never" class="recent-card">
-        <template #header>
-          <div class="card-header-title">
-            <span>最近发布</span>
-            <el-button type="primary" link @click="$router.push('/software/packages')">查看全部</el-button>
-          </div>
-        </template>
-        <el-table :data="recent" stripe>
+      <div class="recent-card stripe-card">
+        <div class="card-header">
+          <span class="card-title">最近发布</span>
+          <el-button type="primary" link @click="$router.push('/software/packages')">查看全部</el-button>
+        </div>
+        <el-table :data="recent">
           <el-table-column prop="packageName" label="软件名称" min-width="180" />
           <el-table-column prop="softwareTypeName" label="类型" width="100">
-            <template #default="{ row }"><el-tag size="small" type="info">{{ row.softwareTypeName }}</el-tag></template>
+            <template #default="{ row }"><el-tag size="small">{{ row.softwareTypeName }}</el-tag></template>
           </el-table-column>
           <el-table-column prop="statusName" label="状态" width="90" align="center">
             <template #default="{ row }">
-              <el-tag :type="row.status === 'PUBLISHED' ? 'success' : 'warning'" size="small">{{ row.statusName }}</el-tag>
+              <span class="status-badge" :class="row.status === 'PUBLISHED' ? 'success' : 'warning'">
+                {{ row.statusName }}
+              </span>
             </template>
           </el-table-column>
           <el-table-column prop="createdAt" label="创建时间" width="170" />
         </el-table>
-      </el-card>
+      </div>
 
-      <el-card shadow="never" class="quick-card">
-        <template #header>
-          <div class="card-header-title">
-            <span>快捷操作</span>
-            <el-badge v-if="overview.pendingCount > 0" :value="overview.pendingCount" type="danger" />
-          </div>
-        </template>
+      <div class="quick-card stripe-card">
+        <div class="card-header">
+          <span class="card-title">快捷操作</span>
+          <el-badge v-if="overview.pendingCount > 0" :value="overview.pendingCount" type="danger" />
+        </div>
         <div class="quick-actions">
-          <div v-if="canCreatePackage" class="action-item card-hover-lift" @click="$router.push('/software/packages/create')">
-            <el-icon :size="36" color="var(--color-primary)"><Plus /></el-icon>
+          <div v-if="canCreatePackage" class="action-item" @click="$router.push('/software/packages/create')">
+            <div class="action-icon" style="background: linear-gradient(135deg, #635bff, #a259ff);">
+              <el-icon :size="20" color="#fff"><Plus /></el-icon>
+            </div>
             <span>新增软件包</span>
           </div>
-          <div v-if="canApplySubscription" class="action-item card-hover-lift" @click="$router.push('/subscription/apply')">
-            <el-icon :size="36" color="var(--color-success)"><ShoppingCart /></el-icon>
+          <div v-if="canApplySubscription" class="action-item" @click="$router.push('/subscription/apply')">
+            <div class="action-icon" style="background: rgba(36, 180, 126, 0.15);">
+              <el-icon :size="20" color="#24b47e"><ShoppingCart /></el-icon>
+            </div>
             <span>申请订购</span>
           </div>
-          <div v-if="canViewBusinessSystem" class="action-item card-hover-lift" @click="$router.push('/business/systems')">
-            <el-icon :size="36" color="var(--color-warning)"><OfficeBuilding /></el-icon>
+          <div v-if="canViewBusinessSystem" class="action-item" @click="$router.push('/business/systems')">
+            <div class="action-icon" style="background: rgba(217, 119, 6, 0.15);">
+              <el-icon :size="20" color="#d97706"><OfficeBuilding /></el-icon>
+            </div>
             <span>业务系统</span>
           </div>
-          <div v-if="canViewStorage" class="action-item card-hover-lift" @click="$router.push('/system/storage')">
-            <el-icon :size="36" color="var(--color-info)"><Files /></el-icon>
+          <div v-if="canViewStorage" class="action-item" @click="$router.push('/system/storage')">
+            <div class="action-icon" style="background: rgba(99, 91, 255, 0.15);">
+              <el-icon :size="20" color="#635bff"><Files /></el-icon>
+            </div>
             <span>存储配置</span>
           </div>
-          <div v-if="canRegisterInventory" class="action-item card-hover-lift" @click="$router.push('/inventory/create')">
-            <el-icon :size="36" color="var(--color-warning)"><Document /></el-icon>
+          <div v-if="canRegisterInventory" class="action-item" @click="$router.push('/inventory/create')">
+            <div class="action-icon" style="background: rgba(217, 119, 6, 0.15);">
+              <el-icon :size="20" color="#d97706"><Document /></el-icon>
+            </div>
             <span>存量登记</span>
           </div>
-          <div v-if="canViewMyInventory" class="action-item card-hover-lift" @click="$router.push('/inventory/my')">
-            <el-icon :size="36" color="var(--color-success)"><List /></el-icon>
+          <div v-if="canViewMyInventory" class="action-item" @click="$router.push('/inventory/my')">
+            <div class="action-icon" style="background: rgba(36, 180, 126, 0.15);">
+              <el-icon :size="20" color="#24b47e"><List /></el-icon>
+            </div>
             <span>我的存量</span>
           </div>
-          <div class="action-item card-hover-lift" @click="$router.push('/portal')">
-            <el-icon :size="36" color="var(--color-primary)"><View /></el-icon>
+          <div class="action-item" @click="$router.push('/portal')">
+            <div class="action-icon" style="background: linear-gradient(135deg, #635bff, #a259ff);">
+              <el-icon :size="20" color="#fff"><View /></el-icon>
+            </div>
             <span>软件门户</span>
           </div>
         </div>
-      </el-card>
+      </div>
     </div>
   </div>
 </template>
@@ -150,43 +162,43 @@ const canViewStorage = computed(() => authStore.hasPermission('storage:read'))
 const canRegisterInventory = computed(() => authStore.hasPermission('inventory:create'))
 const canViewMyInventory = computed(() => authStore.hasPermission('inventory:read'))
 
-// Pie chart option
+// Pie chart option (Stripe style)
 const pieOption = computed(() => ({
   tooltip: { trigger: 'item' },
-  legend: { bottom: '5%', left: 'center' },
+  legend: { bottom: '5%', left: 'center', textStyle: { color: '#525f7f' } },
   series: [{
     name: '软件类型',
     type: 'pie',
-    radius: ['40%', '70%'],
+    radius: ['45%', '70%'],
     avoidLabelOverlap: false,
-    itemStyle: { borderRadius: 10, borderColor: '#fff', borderWidth: 2 },
+    itemStyle: { borderRadius: 6, borderColor: '#fff', borderWidth: 2 },
     label: { show: false, position: 'center' },
-    emphasis: { label: { show: true, fontSize: 16, fontWeight: 'bold' } },
+    emphasis: { label: { show: true, fontSize: 14, fontWeight: '500' } },
     data: [
-      { value: stats.dockerCount || 0, name: 'Docker' },
-      { value: stats.helmCount || 0, name: 'Helm' },
-      { value: stats.mavenCount || 0, name: 'Maven' },
-      { value: stats.npmCount || 0, name: 'NPM' },
-      { value: stats.pypiCount || 0, name: 'PyPI' },
-      { value: stats.genericCount || 0, name: 'Generic' }
+      { value: stats.dockerCount || 0, name: 'Docker', itemStyle: { color: '#635bff' } },
+      { value: stats.helmCount || 0, name: 'Helm', itemStyle: { color: '#24b47e' } },
+      { value: stats.mavenCount || 0, name: 'Maven', itemStyle: { color: '#d97706' } },
+      { value: stats.npmCount || 0, name: 'NPM', itemStyle: { color: '#a259ff' } },
+      { value: stats.pypiCount || 0, name: 'PyPI', itemStyle: { color: '#e25950' } },
+      { value: stats.genericCount || 0, name: 'Generic', itemStyle: { color: '#3b82f6' } }
     ].filter(item => item.value > 0)
   }]
 }))
 
-// Line chart option
+// Line chart option (Stripe style)
 const lineOption = computed(() => ({
   tooltip: { trigger: 'axis' },
   grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
-  xAxis: { type: 'category', boundaryGap: false, data: trend.value.map(t => t.date.slice(5)) },
-  yAxis: { type: 'value', minInterval: 1 },
+  xAxis: { type: 'category', boundaryGap: false, data: trend.value.map(t => t.date.slice(5)), axisLine: { lineStyle: { color: '#e6ebf1' } }, axisLabel: { color: '#525f7f' } },
+  yAxis: { type: 'value', minInterval: 1, axisLine: { show: false }, splitLine: { lineStyle: { color: '#f6f9fc' } }, axisLabel: { color: '#525f7f' } },
   series: [{
     name: '订购数',
     type: 'line',
     smooth: true,
     data: trend.value.map(t => t.count),
-    areaStyle: { color: 'rgba(99, 102, 241, 0.2)' },
-    itemStyle: { color: '#6366f1' },
-    lineStyle: { width: 3 }
+    areaStyle: { color: 'rgba(99, 91, 255, 0.08)' },
+    itemStyle: { color: '#635bff' },
+    lineStyle: { width: 2 }
   }]
 }))
 
@@ -213,27 +225,47 @@ onMounted(async () => {
 <style scoped lang="scss">
 .home-page {
   .page-header {
-    margin-bottom: var(--space-lg);
-    .page-title { font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin: 0; color: var(--color-text-primary); }
-    .page-subtitle { font-size: var(--font-size-sm); color: var(--color-text-secondary); margin: var(--space-xs) 0 0; }
+    margin-bottom: var(--space-xl);
+    .page-title {
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-light);
+      margin: 0;
+      color: var(--color-text-primary);
+      letter-spacing: -0.3px;
+    }
+    .page-subtitle {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+      margin: var(--space-xs) 0 0;
+      font-weight: var(--font-weight-light);
+    }
   }
 
+  // Stats Grid (Stripe style with gradient top bar)
   .stats-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: var(--space-md);
-    margin-bottom: var(--space-lg);
+    gap: var(--space-lg);
+    margin-bottom: var(--space-xl);
   }
 
   .stat-card {
     background: var(--color-bg-card);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
-    padding: var(--space-md);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
+    padding: var(--space-lg);
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(135deg, #635bff, #a259ff);
+    }
 
     .stat-icon {
       width: 40px;
@@ -242,58 +274,142 @@ onMounted(async () => {
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: var(--space-sm);
+      margin-bottom: var(--space-md);
     }
 
-    .stat-value { font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--color-text-primary); }
-    .stat-label { font-size: var(--font-size-xs); color: var(--color-text-secondary); margin-top: var(--space-xs); }
+    .stat-value {
+      font-size: 28px;
+      font-weight: var(--font-weight-light);
+      color: var(--color-text-primary);
+      letter-spacing: -0.5px;
+    }
+    .stat-label {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-tertiary);
+      margin-top: var(--space-xs);
+      font-weight: var(--font-weight-normal);
+    }
   }
 
+  // Charts Row
   .charts-row {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-md);
-    margin-bottom: var(--space-lg);
+    gap: var(--space-lg);
+    margin-bottom: var(--space-xl);
   }
 
   .chart-card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(135deg, #635bff, #a259ff);
+    }
+
+    .chart-header {
+      padding: var(--space-lg) var(--space-lg) var(--space-md);
+      border-bottom: 1px solid var(--color-border-light);
+    }
+
+    .chart-title {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-primary);
+    }
+
     .chart {
       height: 220px;
+      padding: var(--space-md);
     }
   }
 
+  // Bottom Row
   .bottom-row {
     display: grid;
     grid-template-columns: 2fr 1fr;
-    gap: var(--space-md);
+    gap: var(--space-lg);
   }
 
-  .recent-card {
-    min-height: 280px;
-  }
-
+  .recent-card,
   .quick-card {
-    min-height: 280px;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(135deg, #635bff, #a259ff);
+    }
   }
 
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-lg) var(--space-lg) var(--space-md);
+    border-bottom: 1px solid var(--color-border-light);
+  }
+
+  .card-title {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
+  }
+
+  // Quick Actions
   .quick-actions {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: var(--space-sm);
+    padding: var(--space-md);
   }
 
   .action-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--space-xs);
-    padding: var(--space-sm);
-    border: 1px solid var(--color-border-light);
+    gap: var(--space-sm);
+    padding: var(--space-md);
     border-radius: var(--radius-md);
     cursor: pointer;
-    background: var(--color-bg-card);
+    transition: all var(--transition-fast);
 
-    span { font-size: var(--font-size-xs); color: var(--color-text-secondary); }
+    &:hover {
+      background: var(--color-bg-page);
+    }
+
+    span {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-secondary);
+      text-align: center;
+      font-weight: var(--font-weight-normal);
+    }
+  }
+
+  .action-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 
@@ -308,7 +424,7 @@ onMounted(async () => {
 @media (max-width: 768px) {
   .home-page {
     .stats-grid { grid-template-columns: 1fr; }
-    .quick-actions { grid-template-columns: 1fr; }
+    .quick-actions { grid-template-columns: repeat(2, 1fr); }
   }
 }
 </style>

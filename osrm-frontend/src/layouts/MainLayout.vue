@@ -4,7 +4,7 @@
     <aside class="sidebar" :class="{ collapsed: isCollapsed }">
       <div class="sidebar-brand" @click="router.push('/')">
         <div class="brand-icon">
-          <el-icon :size="20"><Box /></el-icon>
+          <el-icon :size="18"><Box /></el-icon>
         </div>
         <span v-if="!isCollapsed" class="brand-name">OSRM</span>
       </div>
@@ -17,7 +17,7 @@
             class="nav-item"
             :class="{ active: isActive(menu.path) }"
           >
-            <el-icon :size="18"><component :is="menu.icon" /></el-icon>
+            <el-icon :size="16"><component :is="menu.icon" /></el-icon>
             <span v-if="!isCollapsed" class="nav-label">{{ menu.title }}</span>
           </router-link>
 
@@ -27,7 +27,7 @@
               :class="{ active: isActive(menu.path), collapsed: isCollapsed }"
               @click="toggleGroup(menu.path)"
             >
-              <el-icon :size="18"><component :is="menu.icon" /></el-icon>
+              <el-icon :size="16"><component :is="menu.icon" /></el-icon>
               <span v-if="!isCollapsed" class="nav-label">{{ menu.title }}</span>
               <el-icon v-if="!isCollapsed" class="nav-arrow" :class="{ expanded: expandedGroups.includes(menu.path) }">
                 <ArrowDown />
@@ -53,8 +53,8 @@
 
       <div class="sidebar-bottom">
         <div class="nav-item collapse-trigger" @click="toggleSidebar">
-          <el-icon :size="18"><Fold v-if="!isCollapsed" /><Expand v-else /></el-icon>
-          <span v-if="!isCollapsed" class="nav-label">收起侧边栏</span>
+          <el-icon :size="16"><Fold v-if="!isCollapsed" /><Expand v-else /></el-icon>
+          <span v-if="!isCollapsed" class="nav-label">收起</span>
         </div>
       </div>
     </aside>
@@ -87,6 +87,7 @@
             <div class="user-trigger">
               <el-avatar :size="28" class="user-avatar">{{ userInitials }}</el-avatar>
               <span class="user-name">{{ authStore.userInfo?.realName || authStore.userInfo?.username }}</span>
+              <el-icon :size="14"><ArrowDown /></el-icon>
             </div>
             <template #dropdown>
               <el-dropdown-menu>
@@ -258,11 +259,11 @@ const handleCommand = async (command: string) => {
   background: var(--color-bg-page);
 }
 
-// ===== Sidebar =====
+// ===== Sidebar (Stripe Style) =====
 .sidebar {
   width: var(--sidebar-width);
   background: var(--color-bg-sidebar);
-  border-right: 1px solid var(--color-sidebar-border);
+  border-right: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
   transition: width var(--transition-slow);
@@ -284,13 +285,13 @@ const handleCommand = async (command: string) => {
   align-items: center;
   gap: var(--space-md);
   padding: 0 var(--space-lg);
-  border-bottom: 1px solid var(--color-sidebar-border);
+  border-bottom: 1px solid var(--color-border);
   cursor: pointer;
 
   .brand-icon {
     width: 32px;
     height: 32px;
-    background: var(--color-primary);
+    background: linear-gradient(135deg, #635bff, #a259ff);
     border-radius: var(--radius-md);
     display: flex;
     align-items: center;
@@ -300,46 +301,53 @@ const handleCommand = async (command: string) => {
   }
 
   .brand-name {
-    font-size: var(--font-size-xl);
-    font-weight: var(--font-weight-bold);
-    color: var(--color-sidebar-text-active);
-    letter-spacing: -0.5px;
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    letter-spacing: -0.2px;
   }
 }
 
 .sidebar-nav {
   flex: 1;
   overflow-y: auto;
-  padding: var(--space-sm) 0;
+  padding: var(--space-md) var(--space-sm);
 }
 
 .nav-item {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
-  padding: var(--space-xs) var(--space-md);
-  margin: 1px var(--space-sm);
+  padding: 10px 12px;
+  margin: 2px 0;
   border-radius: var(--radius-md);
   color: var(--color-sidebar-text);
   text-decoration: none;
   font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
   cursor: pointer;
   transition: all var(--transition-fast);
   user-select: none;
 
   &:hover {
     background: var(--color-sidebar-bg-hover);
-    color: var(--color-sidebar-text-active);
+    color: var(--color-text-primary);
   }
 
   &.active {
     background: var(--color-sidebar-bg-active);
-    color: var(--color-sidebar-text-active);
+    color: var(--color-primary);
     font-weight: var(--font-weight-medium);
   }
 
   .el-icon {
     flex-shrink: 0;
+    opacity: 0.6;
+  }
+
+  &.active .el-icon,
+  &:hover .el-icon {
+    opacity: 1;
   }
 }
 
@@ -364,22 +372,22 @@ const handleCommand = async (command: string) => {
 }
 
 .nav-section {
-  padding: var(--space-lg) var(--space-lg) var(--space-xs) var(--space-xl);
-  font-size: var(--font-size-xs);
+  padding: var(--space-md) var(--space-md) var(--space-xs) var(--space-lg);
+  font-size: 11px;
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-tertiary);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.6px;
 }
 
 .nav-child {
-  padding-left: calc(var(--space-lg) + 28px);
+  padding-left: 36px;
   font-size: var(--font-size-sm);
 }
 
 .sidebar-bottom {
   border-top: 1px solid var(--color-border);
-  padding: var(--space-sm) 0;
+  padding: var(--space-sm);
 }
 
 .collapse-trigger {
@@ -428,13 +436,14 @@ const handleCommand = async (command: string) => {
 }
 
 .theme-toggle {
-  border: none !important;
+  border: 1px solid var(--color-border) !important;
   background: transparent !important;
   color: var(--color-text-secondary) !important;
 
   &:hover {
-    background: var(--color-bg-card-hover) !important;
-    color: var(--color-text-primary) !important;
+    background: var(--color-bg-page) !important;
+    border-color: var(--color-primary) !important;
+    color: var(--color-primary) !important;
   }
 }
 
@@ -448,15 +457,15 @@ const handleCommand = async (command: string) => {
   transition: background var(--transition-fast);
 
   &:hover {
-    background: var(--color-bg-card-hover);
+    background: var(--color-bg-page);
   }
 }
 
 .user-avatar {
-  background: var(--color-primary);
+  background: linear-gradient(135deg, #635bff, #a259ff);
   color: white;
   font-weight: var(--font-weight-semibold);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
 }
 
 .user-name {
@@ -465,13 +474,13 @@ const handleCommand = async (command: string) => {
   color: var(--color-text-primary);
 }
 
-  .content {
-    flex: 1;
-    padding: var(--space-lg);
-    overflow-y: auto;
-  }
+.content {
+  flex: 1;
+  padding: var(--space-xl) var(--space-2xl);
+  overflow-y: auto;
+}
 
-// Element Plus menu dark mode support
+// Element Plus menu support
 :deep(.el-menu) {
   background-color: transparent !important;
 }
@@ -488,6 +497,6 @@ const handleCommand = async (command: string) => {
 
 :deep(.el-menu-item.is-active) {
   background-color: var(--color-sidebar-bg-active) !important;
-  color: var(--color-sidebar-text-active) !important;
+  color: var(--color-primary) !important;
 }
 </style>

@@ -603,3 +603,17 @@ body {
     box-shadow: 0 4px 12px rgba(99, 91, 255, 0.35);
   }
 }
+
+// ===== Fullscreen Mode =====
+body.fullscreen-body {
+  overflow: hidden;
+
+  .sidebar,
+  .topbar {
+    display: none !important;
+  }
+
+  .main-area {
+    margin-left: 0 !important;
+  }
+}

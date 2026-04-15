@@ -1,14 +1,18 @@
 <template>
   <div class="home-page" :class="{ 'fullscreen-mode': isFullscreen }">
-    <div class="page-header" v-if="!isFullscreen">
-      <div class="header-left">
-        <h1 class="page-title">欢迎回来，{{ authStore.userInfo?.realName || '管理员' }}</h1>
-        <p class="page-subtitle">开源软件仓库管理系统</p>
+    <!-- 顶部欢迎区 -->
+    <div class="hero-section" v-if="!isFullscreen">
+      <div class="hero-content">
+        <h1 class="hero-title">
+          <span class="greeting">欢迎回来</span>
+          <span class="username">{{ authStore.userInfo?.realName || '管理员' }}</span>
+        </h1>
+        <p class="hero-subtitle">开源软件仓库管理系统 - 实时数据监控</p>
       </div>
-      <div class="header-right">
-        <el-button v-if="!isFullscreen" type="primary" @click="toggleFullscreen">
+      <div class="hero-actions">
+        <el-button type="primary" size="large" @click="toggleFullscreen">
           <el-icon><FullScreen /></el-icon>
-          {{ isFullscreen ? '退出大屏' : '大屏模式' }}
+          大屏模式
         </el-button>
       </div>
     </div>
@@ -22,181 +26,171 @@
       <div class="fullscreen-time">{{ currentTime }}</div>
     </div>
 
-    <!-- 统计概览卡片 (增强版) -->
-    <div class="stats-overview" :class="{ 'fullscreen-stats': isFullscreen }">
-      <div class="stat-card-large">
-        <div class="stat-icon-large" style="background: linear-gradient(135deg, rgba(99, 91, 255, 0.15), rgba(162, 89, 255, 0.15));">
-          <el-icon :size="28" color="#635bff"><Box /></el-icon>
+    <!-- 统计卡片区 -->
+    <div class="stats-grid" :class="{ 'fullscreen-stats': isFullscreen }">
+      <div class="stat-card" v-for="(stat, index) in statsConfig" :key="index" :style="{ '--accent-color': stat.color }">
+        <div class="stat-bg-gradient"></div>
+        <div class="stat-icon-wrapper">
+          <el-icon :size="32" :color="stat.color"><component :is="stat.icon" /></el-icon>
         </div>
-        <div class="stat-content">
-          <div class="stat-value-large">{{ overview.totalPackages }}</div>
-          <div class="stat-label-large">已发布软件包</div>
+        <div class="stat-info">
+          <div class="stat-value">{{ stat.value }}</div>
+          <div class="stat-label">{{ stat.label }}</div>
         </div>
-        <div class="stat-trend" :class="getTrendClass(overview.trends?.totalPackagesChange)">
-          <el-icon><component :is="getTrendIcon(overview.trends?.totalPackagesChange)" /></el-icon>
-          <span>{{ formatTrend(overview.trends?.totalPackagesChange) }}</span>
-        </div>
-      </div>
-
-      <div class="stat-card-large">
-        <div class="stat-icon-large" style="background: rgba(36, 180, 126, 0.15);">
-          <el-icon :size="28" color="#24b47e"><ShoppingCart /></el-icon>
-        </div>
-        <div class="stat-content">
-          <div class="stat-value-large">{{ overview.totalSubscriptions }}</div>
-          <div class="stat-label-large">总订购数</div>
-        </div>
-        <div class="stat-trend" :class="getTrendClass(overview.trends?.totalSubscriptionsChange)">
-          <el-icon><component :is="getTrendIcon(overview.trends?.totalSubscriptionsChange)" /></el-icon>
-          <span>{{ formatTrend(overview.trends?.totalSubscriptionsChange) }}</span>
+        <div class="stat-trend" :class="getTrendClass(stat.change)">
+          <el-icon><component :is="getTrendIcon(stat.change)" /></el-icon>
+          <span>{{ formatTrend(stat.change) }}</span>
         </div>
       </div>
+    </div>
 
-      <div class="stat-card-large">
-        <div class="stat-icon-large" style="background: rgba(217, 119, 6, 0.15);">
-          <el-icon :size="28" color="#d97706"><OfficeBuilding /></el-icon>
+    <!-- 快捷操作入口 -->
+    <div class="quick-actions" v-if="!isFullscreen">
+      <div class="quick-actions-card">
+        <div class="quick-header">
+          <span class="quick-title">快捷操作</span>
         </div>
-        <div class="stat-content">
-          <div class="stat-value-large">{{ overview.activeBusinessSystems }}</div>
-          <div class="stat-label-large">活跃业务系统</div>
-        </div>
-        <div class="stat-trend" :class="getTrendClass(overview.trends?.activeBusinessSystemsChange)">
-          <el-icon><component :is="getTrendIcon(overview.trends?.activeBusinessSystemsChange)" /></el-icon>
-          <span>{{ formatTrend(overview.trends?.activeBusinessSystemsChange) }}</span>
-        </div>
-      </div>
-
-      <div class="stat-card-large">
-        <div class="stat-icon-large" style="background: rgba(99, 91, 255, 0.15);">
-          <el-icon :size="28" color="#635bff"><Calendar /></el-icon>
-        </div>
-        <div class="stat-content">
-          <div class="stat-value-large">{{ overview.newSubscriptionsThisMonth }}</div>
-          <div class="stat-label-large">本月新增订购</div>
-        </div>
-        <div class="stat-trend" :class="getTrendClass(overview.trends?.newSubscriptionsThisMonthChange)">
-          <el-icon><component :is="getTrendIcon(overview.trends?.newSubscriptionsThisMonthChange)" /></el-icon>
-          <span>{{ formatTrend(overview.trends?.newSubscriptionsThisMonthChange) }}</span>
+        <div class="quick-buttons">
+          <el-button v-if="canCreatePackage" type="primary" plain @click="$router.push('/software/packages/create')">
+            <el-icon><Plus /></el-icon>
+            新建软件包
+          </el-button>
+          <el-button v-if="canApplySubscription" type="primary" plain @click="$router.push('/subscription/apply')">
+            <el-icon><ShoppingCart /></el-icon>
+            申请订购
+          </el-button>
+          <el-button v-if="canRegisterInventory" type="primary" plain @click="$router.push('/inventory/create')">
+            <el-icon><Document /></el-icon>
+            存量登记
+          </el-button>
+          <el-button v-if="canViewMyInventory" type="primary" plain @click="$router.push('/inventory/my')">
+            <el-icon><List /></el-icon>
+            我的存量
+          </el-button>
         </div>
       </div>
     </div>
 
     <!-- 图表区域 -->
-    <div class="charts-row" :class="{ 'fullscreen-charts': isFullscreen }">
-      <!-- 订购趋势图 -->
-      <div class="chart-card stripe-card">
-        <div class="chart-header">
-          <span class="chart-title">订购趋势</span>
-          <el-radio-group v-if="!isFullscreen" v-model="trendDays" size="small" @change="loadTrend">
-            <el-radio-button :label="7">近7天</el-radio-button>
-            <el-radio-button :label="14">近14天</el-radio-button>
-            <el-radio-button :label="30">近30天</el-radio-button>
-          </el-radio-group>
-        </div>
-        <div class="trend-summary" v-if="trend.summary && !isFullscreen">
-          <div class="summary-item">
-            <span class="summary-label">总订购</span>
-            <span class="summary-value">{{ trend.summary.totalSubscriptionCount }}</span>
-          </div>
-          <div class="summary-item">
-            <span class="summary-label">已审批</span>
-            <span class="summary-value success">{{ trend.summary.totalApprovedCount }}</span>
-          </div>
-          <div class="summary-item">
-            <span class="summary-label">已拒绝</span>
-            <span class="summary-value danger">{{ trend.summary.totalRejectedCount }}</span>
-          </div>
-          <div class="summary-item">
-            <span class="summary-label">日均</span>
-            <span class="summary-value">{{ trend.summary.averageDaily }}</span>
-          </div>
-        </div>
-        <v-chart class="chart" :option="trendChartOption" autoresize />
-      </div>
-
-      <!-- 软件类型分布图 -->
-      <div class="chart-card stripe-card">
-        <div class="chart-header">
-          <span class="chart-title">软件类型分布</span>
-        </div>
-        <v-chart class="chart pie-chart" :option="typeChartOption" autoresize />
-        <div class="type-legend" v-if="!isFullscreen">
-          <div v-for="item in typeDistribution.data" :key="item.type" class="legend-item">
-            <span class="legend-color" :style="{ background: item.color }"></span>
-            <span class="legend-label">{{ item.typeName }}</span>
-            <span class="legend-value">{{ item.packageCount }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 下方区域 -->
-    <div class="bottom-row" :class="{ 'fullscreen-bottom': isFullscreen }">
-      <!-- 软件包热度排行 -->
-      <div class="ranking-card stripe-card">
-        <div class="card-header">
-          <span class="card-title">软件包热度排行</span>
-          <el-radio-group v-if="!isFullscreen" v-model="rankingSortBy" size="small" @change="loadPopularity">
-            <el-radio-button label="subscription_count">按订购数</el-radio-button>
-            <el-radio-button label="business_system_count">按业务系统数</el-radio-button>
-          </el-radio-group>
-        </div>
-        <el-table :data="popularity.data" size="small" :class="{ 'fullscreen-table': isFullscreen }">
-          <el-table-column type="index" label="排名" width="60" align="center">
-            <template #default="{ $index }">
-              <div class="rank-cell" :class="{ 'top-3': $index < 3 }">{{ $index + 1 }}</div>
-            </template>
-          </el-table-column>
-          <el-table-column prop="packageName" label="软件包" min-width="150" show-overflow-tooltip />
-          <el-table-column prop="softwareType" label="类型" width="100">
-            <template #default="{ row }">
-              <el-tag size="small" type="info">{{ formatType(row.softwareType) }}</el-tag>
-            </template>
-          </el-table-column>
-          <el-table-column prop="subscriptionCount" label="订购数" width="90" align="center" sortable />
-          <el-table-column prop="businessSystemCount" label="关联系统" width="90" align="center" sortable />
-          <el-table-column prop="trend" label="趋势" width="80" align="center">
-            <template #default="{ row }">
-              <el-tag :type="row.trend === 'up' ? 'success' : row.trend === 'down' ? 'danger' : 'info'" size="small">
-                <el-icon>
-                  <ArrowUp v-if="row.trend === 'up'" />
-                  <ArrowDown v-else-if="row.trend === 'down'" />
-                  <Minus v-else />
-                </el-icon>
-                {{ row.change > 0 ? '+' + row.change : row.change }}
-              </el-tag>
-            </template>
-          </el-table-column>
-        </el-table>
-      </div>
-
-      <!-- 业务系统分布 -->
-      <div class="distribution-card stripe-card">
-        <div class="card-header">
-          <span class="card-title">业务系统分布</span>
-          <el-link type="primary" @click="$router.push('/business/systems')" v-if="!isFullscreen">查看全部</el-link>
-        </div>
-        <div class="distribution-summary" v-if="!isFullscreen">
-          <div class="summary-box">
-            <div class="summary-num">{{ businessDistribution.totalBusinessSystems }}</div>
-            <div class="summary-text">活跃系统</div>
-          </div>
-          <div class="summary-box">
-            <div class="summary-num">{{ businessDistribution.totalSubscriptions }}</div>
-            <div class="summary-text">总订购</div>
-          </div>
-        </div>
-        <div class="distribution-list">
-          <div v-for="item in businessDistribution.data?.slice(0, isFullscreen ? 10 : 5)" :key="item.systemId" class="distribution-item">
-            <div class="item-info">
-              <div class="item-name">{{ item.systemName }}</div>
-              <div class="item-code">{{ item.systemCode }}</div>
+    <div class="main-content" :class="{ 'fullscreen-charts': isFullscreen }">
+      <!-- 左侧图表 -->
+      <div class="charts-left">
+        <div class="chart-card stripe-card">
+          <div class="chart-header">
+            <div class="header-left">
+              <span class="chart-title">订购趋势</span>
+              <el-radio-group v-if="!isFullscreen" v-model="trendDays" size="small" @change="loadTrend">
+                <el-radio-button :label="7">近7天</el-radio-button>
+                <el-radio-button :label="14">近14天</el-radio-button>
+                <el-radio-button :label="30">近30天</el-radio-button>
+              </el-radio-group>
             </div>
-            <div class="item-stats">
-              <el-tag size="small" type="primary">{{ item.packageCount }}</el-tag>
-              <el-tag size="small" type="success">{{ item.subscriptionCount }}</el-tag>
+          </div>
+          <div class="trend-summary" v-if="trend.summary && !isFullscreen">
+            <div class="summary-item">
+              <span class="summary-label">总订购</span>
+              <span class="summary-value">{{ trend.summary.totalSubscriptionCount }}</span>
             </div>
-            <el-progress v-if="!isFullscreen" :percentage="item.percentage" :stroke-width="6" :show-text="false" />
+            <div class="summary-item">
+              <span class="summary-label">已审批</span>
+              <span class="summary-value success">{{ trend.summary.totalApprovedCount }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">已拒绝</span>
+              <span class="summary-value danger">{{ trend.summary.totalRejectedCount }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">日均</span>
+              <span class="summary-value">{{ trend.summary.averageDaily }}</span>
+            </div>
+          </div>
+          <v-chart class="chart" :option="trendChartOption" autoresize />
+        </div>
+
+        <!-- 软件包热度排行 -->
+        <div class="ranking-card stripe-card">
+          <div class="card-header">
+            <span class="card-title">软件包热度排行</span>
+            <el-radio-group v-if="!isFullscreen" v-model="rankingSortBy" size="small" @change="loadPopularity">
+              <el-radio-button label="subscription_count">按订购数</el-radio-button>
+              <el-radio-button label="business_system_count">按业务系统数</el-radio-button>
+            </el-radio-group>
+          </div>
+          <el-table :data="popularity.data" size="small" :class="{ 'fullscreen-table': isFullscreen }" :show-header="!isFullscreen">
+            <el-table-column type="index" label="排名" width="60" align="center">
+              <template #default="{ $index }">
+                <div class="rank-cell" :class="{ 'top-3': $index < 3 }">{{ $index + 1 }}</div>
+              </template>
+            </el-table-column>
+            <el-table-column prop="packageName" label="软件包" min-width="150" show-overflow-tooltip />
+            <el-table-column prop="softwareType" label="类型" width="100">
+              <template #default="{ row }">
+                <el-tag size="small" type="info">{{ formatType(row.softwareType) }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column prop="subscriptionCount" label="订购数" width="90" align="center" sortable />
+            <el-table-column prop="businessSystemCount" label="关联系统" width="90" align="center" sortable />
+            <el-table-column prop="trend" label="趋势" width="80" align="center">
+              <template #default="{ row }">
+                <el-tag :type="row.trend === 'up' ? 'success' : row.trend === 'down' ? 'danger' : 'info'" size="small">
+                  <el-icon>
+                    <ArrowUp v-if="row.trend === 'up'" />
+                    <ArrowDown v-else-if="row.trend === 'down'" />
+                    <Minus v-else />
+                  </el-icon>
+                  {{ row.change > 0 ? '+' + row.change : row.change }}
+                </el-tag>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+      </div>
+
+      <!-- 右侧面板 -->
+      <div class="charts-right">
+        <!-- 软件类型分布图 -->
+        <div class="chart-card stripe-card">
+          <div class="chart-header">
+            <span class="chart-title">软件类型分布</span>
+          </div>
+          <v-chart class="chart pie-chart" :option="typeChartOption" autoresize />
+          <div class="type-legend" v-if="!isFullscreen">
+            <div v-for="item in typeDistribution.data" :key="item.type" class="legend-item">
+              <span class="legend-color" :style="{ background: item.color }"></span>
+              <span class="legend-label">{{ item.typeName }}</span>
+              <span class="legend-value">{{ item.packageCount }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 业务系统分布 -->
+        <div class="distribution-card stripe-card">
+          <div class="card-header">
+            <span class="card-title">业务系统分布</span>
+            <el-link type="primary" @click="$router.push('/business/systems')" v-if="!isFullscreen">查看全部</el-link>
+          </div>
+          <div class="distribution-summary" v-if="!isFullscreen">
+            <div class="summary-box">
+              <div class="summary-num">{{ businessDistribution.totalBusinessSystems }}</div>
+              <div class="summary-text">活跃系统</div>
+            </div>
+            <div class="summary-box">
+              <div class="summary-num">{{ businessDistribution.totalSubscriptions }}</div>
+              <div class="summary-text">总订购</div>
+            </div>
+          </div>
+          <div class="distribution-list">
+            <div v-for="item in businessDistribution.data?.slice(0, isFullscreen ? 10 : 5)" :key="item.systemId" class="distribution-item">
+              <div class="item-info">
+                <div class="item-name">{{ item.systemName }}</div>
+                <div class="item-code">{{ item.systemCode }}</div>
+              </div>
+              <div class="item-stats">
+                <el-tag size="small" type="primary">{{ item.packageCount }}</el-tag>
+                <el-tag size="small" type="success">{{ item.subscriptionCount }}</el-tag>
+              </div>
+              <el-progress v-if="!isFullscreen" :percentage="item.percentage" :stroke-width="6" :show-text="false" />
+            </div>
           </div>
         </div>
       </div>
@@ -249,6 +243,38 @@ let timeInterval: ReturnType<typeof setInterval>
 // UI state
 const trendDays = ref(7)
 const rankingSortBy = ref('subscription_count')
+
+// Stats card configuration
+const statsConfig = computed(() => [
+  {
+    icon: Box,
+    value: overview.totalPackages || 0,
+    label: '已发布软件包',
+    change: overview.trends?.totalPackagesChange || 0,
+    color: '#635bff'
+  },
+  {
+    icon: ShoppingCart,
+    value: overview.totalSubscriptions || 0,
+    label: '总订购数',
+    change: overview.trends?.totalSubscriptionsChange || 0,
+    color: '#24b47e'
+  },
+  {
+    icon: OfficeBuilding,
+    value: overview.activeBusinessSystems || 0,
+    label: '活跃业务系统',
+    change: overview.trends?.activeBusinessSystemsChange || 0,
+    color: '#d97706'
+  },
+  {
+    icon: Calendar,
+    value: overview.newSubscriptionsThisMonth || 0,
+    label: '本月新增订购',
+    change: overview.trends?.newSubscriptionsThisMonthChange || 0,
+    color: '#a259ff'
+  }
+])
 
 // 快捷操作权限
 const canCreatePackage = computed(() => authStore.hasPermission('package:create'))
@@ -458,43 +484,15 @@ onUnmounted(() => {
 
 <style scoped lang="scss">
 .home-page {
-  .page-header {
+  // Hero Section
+  .hero-section {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: var(--space-xl);
-
-    .page-title {
-      font-size: var(--font-size-3xl);
-      font-weight: var(--font-weight-light);
-      margin: 0;
-      color: var(--color-text-primary);
-      letter-spacing: -0.3px;
-    }
-    .page-subtitle {
-      font-size: var(--font-size-sm);
-      color: var(--color-text-secondary);
-      margin: var(--space-xs) 0 0;
-      font-weight: var(--font-weight-light);
-    }
-  }
-
-  // 统计概览卡片 (增强版)
-  .stats-overview {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--space-lg);
-    margin-bottom: var(--space-xl);
-  }
-
-  .stat-card-large {
-    background: var(--color-bg-card);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    padding: var(--space-xl);
-    display: flex;
     align-items: center;
-    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+    padding: var(--space-xl);
+    background: var(--color-bg-card);
+    border-radius: var(--radius-xl);
     position: relative;
     overflow: hidden;
 
@@ -504,62 +502,202 @@ onUnmounted(() => {
       top: 0;
       left: 0;
       right: 0;
-      height: 3px;
+      height: 4px;
       background: linear-gradient(135deg, #635bff, #a259ff);
     }
 
-    .stat-icon-large {
-      width: 48px;
-      height: 48px;
-      border-radius: var(--radius-md);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
+    &::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(99, 91, 255, 0.08) 0%, transparent 70%);
+      pointer-events: none;
     }
 
-    .stat-content {
-      flex: 1;
+    .hero-content {
+      position: relative;
+      z-index: 1;
+
+      .hero-title {
+        margin: 0 0 var(--space-xs);
+        display: flex;
+        align-items: baseline;
+        gap: var(--space-sm);
+
+        .greeting {
+          font-size: var(--font-size-2xl);
+          font-weight: var(--font-weight-light);
+          color: var(--color-text-secondary);
+        }
+
+        .username {
+          font-size: var(--font-size-3xl);
+          font-weight: var(--font-weight-semibold);
+          color: var(--color-text-primary);
+        }
+      }
+
+      .hero-subtitle {
+        font-size: var(--font-size-sm);
+        color: var(--color-text-secondary);
+        margin: 0;
+      }
     }
 
-    .stat-value-large {
-      font-size: var(--font-size-3xl);
-      font-weight: var(--font-weight-bold);
-      color: var(--color-text-primary);
-      line-height: 1.2;
-    }
-
-    .stat-label-large {
-      font-size: var(--font-size-sm);
-      color: var(--color-text-secondary);
-      margin-top: var(--space-xs);
-    }
-
-    .stat-trend {
-      display: flex;
-      align-items: center;
-      gap: var(--space-xs);
-      font-size: var(--font-size-xs);
-      font-weight: var(--font-weight-medium);
-
-      &.trend-up { color: var(--color-success); }
-      &.trend-down { color: var(--color-danger); }
-      &.trend-stable { color: var(--color-text-secondary); }
+    .hero-actions {
+      position: relative;
+      z-index: 1;
     }
   }
 
-  // Charts Row
-  .charts-row {
+  // Stats Grid
+  .stats-grid {
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: repeat(4, 1fr);
     gap: var(--space-lg);
     margin-bottom: var(--space-xl);
   }
 
+  .stat-card {
+    background: var(--color-bg-card);
+    border-radius: var(--radius-xl);
+    padding: var(--space-xl);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+      border-color: var(--accent-color);
+    }
+
+    .stat-bg-gradient {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 120px;
+      height: 120px;
+      background: radial-gradient(circle, rgba(var(--accent-color), 0.1) 0%, transparent 70%);
+      opacity: 0.5;
+    }
+
+    .stat-icon-wrapper {
+      width: 56px;
+      height: 56px;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, rgba(99, 91, 255, 0.1), rgba(162, 89, 255, 0.1));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: var(--space-md);
+    }
+
+    .stat-info {
+      margin-bottom: var(--space-sm);
+
+      .stat-value {
+        font-size: 32px;
+        font-weight: var(--font-weight-bold);
+        color: var(--color-text-primary);
+        line-height: 1.1;
+      }
+
+      .stat-label {
+        font-size: var(--font-size-sm);
+        color: var(--color-text-secondary);
+        margin-top: var(--space-xs);
+      }
+    }
+
+    .stat-trend {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-medium);
+      padding: var(--space-xs) var(--space-sm);
+      border-radius: var(--radius-md);
+      background: var(--color-bg-page);
+
+      &.trend-up {
+        color: var(--color-success);
+        background: rgba(36, 180, 126, 0.1);
+      }
+      &.trend-down {
+        color: var(--color-danger);
+        background: rgba(226, 89, 80, 0.1);
+      }
+      &.trend-stable {
+        color: var(--color-text-secondary);
+      }
+    }
+  }
+
+  // Quick Actions
+  .quick-actions {
+    margin-bottom: var(--space-xl);
+
+    .quick-actions-card {
+      background: var(--color-bg-card);
+      border-radius: var(--radius-xl);
+      padding: var(--space-lg);
+      position: relative;
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(135deg, #635bff, #a259ff);
+      }
+
+      .quick-header {
+        margin-bottom: var(--space-md);
+
+        .quick-title {
+          font-size: var(--font-size-sm);
+          font-weight: var(--font-weight-semibold);
+          color: var(--color-text-primary);
+        }
+      }
+
+      .quick-buttons {
+        display: flex;
+        gap: var(--space-sm);
+        flex-wrap: wrap;
+
+        .el-button {
+          border-radius: var(--radius-md);
+        }
+      }
+    }
+  }
+
+  // Main Content
+  .main-content {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: var(--space-lg);
+  }
+
+  .charts-left,
+  .charts-right {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+
+  // Chart Card
   .chart-card {
     background: var(--color-bg-card);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-xl);
     overflow: hidden;
     position: relative;
 
@@ -578,22 +716,27 @@ onUnmounted(() => {
       justify-content: space-between;
       align-items: center;
       padding: var(--space-lg) var(--space-lg) var(--space-md);
-      border-bottom: 1px solid var(--color-border-light);
+
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: var(--space-md);
+      }
     }
 
     .chart-title {
       font-size: var(--font-size-sm);
-      font-weight: var(--font-weight-medium);
+      font-weight: var(--font-weight-semibold);
       color: var(--color-text-primary);
     }
 
     .chart {
-      height: 260px;
+      height: 240px;
       padding: var(--space-md);
     }
 
     .pie-chart {
-      height: 200px;
+      height: 180px;
     }
 
     .trend-summary {
@@ -627,6 +770,7 @@ onUnmounted(() => {
 
     .type-legend {
       margin-top: var(--space-md);
+      padding: 0 var(--space-md) var(--space-md);
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: var(--space-sm);
@@ -634,72 +778,53 @@ onUnmounted(() => {
       .legend-item {
         display: flex;
         align-items: center;
-        gap: var(--space-xs);
+        gap: var(--space-sm);
         font-size: var(--font-size-xs);
 
         .legend-color {
-          width: 12px;
-          height: 12px;
+          width: 14px;
+          height: 14px;
           border-radius: var(--radius-sm);
+          flex-shrink: 0;
         }
 
         .legend-label {
           color: var(--color-text-secondary);
           flex: 1;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
 
         .legend-value {
           color: var(--color-text-primary);
-          font-weight: var(--font-weight-medium);
+          font-weight: var(--font-weight-semibold);
         }
       }
     }
   }
 
-  // Bottom Row
-  .bottom-row {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: var(--space-lg);
-  }
+  // Ranking Card
+  .ranking-card {
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-lg) var(--space-lg) var(--space-md);
+      border-bottom: 1px solid var(--color-border-light);
+    }
 
-  .ranking-card,
-  .distribution-card {
-    background: var(--color-bg-card);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    position: relative;
-
-    &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(135deg, #635bff, #a259ff);
+    .card-title {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
     }
   }
 
-  .card-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: var(--space-lg) var(--space-lg) var(--space-md);
-    border-bottom: 1px solid var(--color-border-light);
-  }
-
-  .card-title {
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-medium);
-    color: var(--color-text-primary);
-  }
-
-  // 排名单元格
+  // Rank Cell
   .rank-cell {
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     background: var(--color-bg-page);
     display: flex;
@@ -708,72 +833,98 @@ onUnmounted(() => {
     font-size: var(--font-size-xs);
     font-weight: var(--font-weight-bold);
     margin: 0 auto;
+    transition: all 0.2s;
 
     &.top-3 {
-      background: var(--color-primary);
+      background: linear-gradient(135deg, #635bff, #a259ff);
       color: white;
     }
   }
 
-  // 业务系统分布
-  .distribution-summary {
-    display: flex;
-    gap: var(--space-lg);
-    margin-bottom: var(--space-lg);
-    padding: var(--space-md);
-    background: var(--color-bg-page);
-    border-radius: var(--radius-md);
-
-    .summary-box {
-      flex: 1;
-      text-align: center;
-
-      .summary-num {
-        font-size: var(--font-size-2xl);
-        font-weight: var(--font-weight-bold);
-        color: var(--color-primary);
-      }
-
-      .summary-text {
-        font-size: var(--font-size-xs);
-        color: var(--color-text-secondary);
-        margin-top: var(--space-xs);
-      }
+  // Distribution Card
+  .distribution-card {
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-lg) var(--space-lg) var(--space-md);
+      border-bottom: 1px solid var(--color-border-light);
     }
-  }
 
-  .distribution-list {
-    padding: var(--space-md);
+    .card-title {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
+    }
 
-    .distribution-item {
+    .distribution-summary {
+      display: flex;
+      gap: var(--space-lg);
+      margin-bottom: var(--space-lg);
       padding: var(--space-md);
       background: var(--color-bg-page);
       border-radius: var(--radius-md);
-      margin-bottom: var(--space-sm);
 
-      .item-info {
-        margin-bottom: var(--space-sm);
+      .summary-box {
+        flex: 1;
+        text-align: center;
 
-        .item-name {
-          font-weight: var(--font-weight-medium);
-          color: var(--color-text-primary);
+        .summary-num {
+          font-size: var(--font-size-2xl);
+          font-weight: var(--font-weight-bold);
+          background: linear-gradient(135deg, #635bff, #a259ff);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
         }
 
-        .item-code {
+        .summary-text {
           font-size: var(--font-size-xs);
           color: var(--color-text-secondary);
+          margin-top: var(--space-xs);
         }
       }
+    }
 
-      .item-stats {
-        display: flex;
-        gap: var(--space-xs);
+    .distribution-list {
+      padding: var(--space-md);
+
+      .distribution-item {
+        padding: var(--space-md);
+        background: var(--color-bg-page);
+        border-radius: var(--radius-md);
         margin-bottom: var(--space-sm);
+        transition: all 0.2s;
+
+        &:hover {
+          background: var(--color-bg-hover);
+        }
+
+        .item-info {
+          margin-bottom: var(--space-sm);
+
+          .item-name {
+            font-weight: var(--font-weight-medium);
+            color: var(--color-text-primary);
+            font-size: var(--font-size-sm);
+          }
+
+          .item-code {
+            font-size: var(--font-size-xs);
+            color: var(--color-text-secondary);
+          }
+        }
+
+        .item-stats {
+          display: flex;
+          gap: var(--space-xs);
+          margin-bottom: var(--space-sm);
+        }
       }
     }
   }
 
-  // ===== 大屏模式样式 =====
+  // ===== Fullscreen Mode =====
   &.fullscreen-mode {
     position: fixed;
     top: 0;
@@ -791,13 +942,15 @@ onUnmounted(() => {
       align-items: center;
       margin-bottom: var(--space-xl);
       padding-bottom: var(--space-lg);
-      border-bottom: 1px solid var(--color-border);
 
       .fullscreen-title {
         h1 {
           font-size: var(--font-size-3xl);
           font-weight: var(--font-weight-bold);
-          color: var(--color-primary);
+          background: linear-gradient(135deg, #635bff, #a259ff);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
           margin: 0 0 var(--space-xs);
         }
 
@@ -815,39 +968,18 @@ onUnmounted(() => {
       }
     }
 
-    .stats-overview.fullscreen-stats {
+    .stats-grid.fullscreen-stats {
       grid-template-columns: repeat(4, 1fr);
       gap: var(--space-xl);
-    }
-
-    .stat-card-large {
-      padding: var(--space-2xl);
-
-      .stat-icon-large {
-        width: 56px;
-        height: 56px;
-      }
-
-      .stat-value-large {
-        font-size: 36px;
-      }
-
-      .stat-label-large {
-        font-size: var(--font-size-md);
-      }
-    }
-
-    .charts-row.fullscreen-charts {
-      grid-template-columns: 1.5fr 1fr;
       margin-bottom: var(--space-xl);
-
-      .chart-card .chart {
-        height: 320px;
-      }
     }
 
-    .bottom-row.fullscreen-bottom {
+    .main-content.fullscreen-charts {
       grid-template-columns: 1.5fr 1fr;
+
+      .chart {
+        height: 300px;
+      }
     }
 
     .exit-fullscreen-btn {
@@ -855,27 +987,46 @@ onUnmounted(() => {
       bottom: var(--space-xl);
       right: var(--space-xl);
       z-index: 10000;
+      border-radius: var(--radius-lg);
+      padding: var(--space-md) var(--space-xl);
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 1400px) {
+  .home-page {
+    .main-content {
+      grid-template-columns: 1fr;
+    }
+
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
     }
   }
 }
 
 @media (max-width: 1200px) {
   .home-page {
-    .stats-overview { grid-template-columns: repeat(2, 1fr); }
-    .charts-row { grid-template-columns: 1fr; }
-    .bottom-row { grid-template-columns: 1fr; }
-
     &.fullscreen-mode {
-      .stats-overview.fullscreen-stats { grid-template-columns: repeat(2, 1fr); }
-      .charts-row.fullscreen-charts { grid-template-columns: 1fr; }
-      .bottom-row.fullscreen-bottom { grid-template-columns: 1fr; }
+      .stats-grid.fullscreen-stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
   }
 }
 
 @media (max-width: 768px) {
   .home-page {
-    .stats-overview { grid-template-columns: 1fr; }
+    .hero-section {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-md);
+    }
+
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
   }
 }
 </style>

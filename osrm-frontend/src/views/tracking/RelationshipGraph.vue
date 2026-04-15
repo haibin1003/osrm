@@ -119,6 +119,47 @@
           />
         </div>
 
+        <!-- 全屏模式详情浮层 -->
+        <div class="detail-overlay" v-if="selectedNode && isFullscreen">
+          <div class="overlay-header">
+            <span class="overlay-title">{{ selectedNode.type === 'system' ? '业务系统详情' : '软件包详情' }}</span>
+            <el-button text @click="selectedNode = null">
+              <el-icon><Close /></el-icon>
+            </el-button>
+          </div>
+          <div class="overlay-content">
+            <div class="detail-item">
+              <label>名称</label>
+              <span>{{ selectedNode.name }}</span>
+            </div>
+            <template v-if="selectedNode.type === 'system'">
+              <div class="detail-item">
+                <label>系统代码</label>
+                <span>{{ selectedNode.systemCode }}</span>
+              </div>
+              <div class="detail-item">
+                <label>业务域</label>
+                <el-tag size="small">{{ formatDomain(selectedNode.domain) }}</el-tag>
+              </div>
+            </template>
+            <template v-else>
+              <div class="detail-item">
+                <label>唯一标识</label>
+                <span>{{ selectedNode.packageKey }}</span>
+              </div>
+              <div class="detail-item">
+                <label>软件类型</label>
+                <el-tag :color="typeColors[selectedNode.softwareType]" size="small">{{ formatType(selectedNode.softwareType) }}</el-tag>
+              </div>
+            </template>
+          </div>
+          <div class="overlay-actions">
+            <el-button type="primary" size="small" @click="selectedNode.type === 'system' ? loadSystemDependencies() : loadPackageImpact()">
+              查看详情
+            </el-button>
+          </div>
+        </div>
+
         <div class="graph-hint">
           <el-tag size="small" type="info">
             <el-icon><InfoFilled /></el-icon>
@@ -128,7 +169,7 @@
       </div>
 
       <!-- 右侧详情面板 -->
-      <div class="detail-panel" v-if="selectedNode">
+      <div class="detail-panel" v-if="selectedNode && !isFullscreen">
         <div class="panel-section" v-if="selectedNode.type === 'system'">
           <h3 class="panel-title">业务系统详情</h3>
           <div class="detail-content">
@@ -276,7 +317,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed } from 'vue'
-import { Refresh, FullScreen, InfoFilled, Pointer, ZoomIn, ZoomOut, FullScreen as FullScreenIcon } from '@element-plus/icons-vue'
+import { Refresh, FullScreen, InfoFilled, Pointer, ZoomIn, ZoomOut, FullScreen as FullScreenIcon, Close } from '@element-plus/icons-vue'
 import { trackingApi, type RelationshipGraph, type SystemNode, type PackageNode, type GraphNode } from '@/api/tracking'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
@@ -306,16 +347,45 @@ const nodeDetails = ref<Array<{ id: string; name: string; version?: string; stat
 const impactDialogVisible = ref(false)
 const impactData = ref<any>(null)
 const chartRef = ref<any>(null)
+const isFullscreen = ref(false)
 
-// Type colors
-const typeColors: Record<string, string> = {
-  'DOCKER_IMAGE': '#91cc75',
-  'HELM_CHART': '#fac858',
-  'MAVEN': '#ee6666',
-  'NPM': '#73c0de',
-  'PYPI': '#3ba272',
-  'GENERIC': '#9a60b4'
+// Listen for fullscreen changes
+function handleFullscreenChange() {
+  isFullscreen.value = !!document.fullscreenElement
 }
+
+// Type colors - Stripe vibrant colors
+const typeColors: Record<string, string> = {
+  'DOCKER_IMAGE': '#635bff',  // Stripe Purple
+  'HELM_CHART': '#24b47e',   // Stripe Green
+  'MAVEN': '#e25950',        // Stripe Coral Red
+  'NPM': '#d97706',          // Stripe Orange
+  'PYPI': '#3ba272',         // Teal
+  'GENERIC': '#a259ff'        // Stripe Light Purple
+}
+
+// System node color
+const systemColor = '#32325d'  // Stripe Dark Text
+
+// Filter nodes and edges based on view mode
+const filteredNodes = computed(() => {
+  if (viewMode.value === 'system') {
+    // Only show system nodes
+    return graphData.nodes.filter(node => node.type === 'system')
+  } else if (viewMode.value === 'package') {
+    // Only show package nodes
+    return graphData.nodes.filter(node => node.type === 'package')
+  }
+  // Global: show all
+  return graphData.nodes
+})
+
+const filteredEdges = computed(() => {
+  const nodeIds = new Set(filteredNodes.value.map(n => n.id))
+  return graphData.edges.filter(edge =>
+    nodeIds.has(edge.source as string) && nodeIds.has(edge.target as string)
+  )
+})
 
 // Chart option
 const chartOption = computed(() => ({
@@ -348,26 +418,26 @@ const chartOption = computed(() => ({
   ],
   series: [{
     type: 'graph',
-    layout: 'force',
-    data: graphData.nodes.map(node => ({
+    layout: viewMode.value === 'package' ? 'circular' : 'force',
+    data: filteredNodes.value.map(node => ({
       ...node,
-      symbol: node.type === 'system' ? 'circle' : 'rect',
-      symbolSize: node.type === 'system' ? 50 : [60, 40],
+      symbol: getNodeSymbol(node, viewMode.value),
+      symbolSize: getNodeSize(node, viewMode.value),
       itemStyle: {
-        color: node.type === 'system'
-          ? '#5470c6'
-          : typeColors[(node as PackageNode).softwareType] || '#999'
+        color: node.type === 'system' ? systemColor : typeColors[(node as PackageNode).softwareType] || '#999'
       },
       label: {
         show: true,
         position: 'bottom',
-        formatter: '{b}'
+        formatter: '{b}',
+        fontSize: 11,
+        fontWeight: 300
       }
     })),
-    links: graphData.edges.map(edge => ({
+    links: filteredEdges.value.map(edge => ({
       ...edge,
       lineStyle: {
-        color: edge.sourceType === 'INVENTORY' ? '#e6a23c' : '#ccc',
+        color: edge.sourceType === 'INVENTORY' ? '#f59e0b' : '#e0e0e0',
         curveness: 0.1
       },
       label: {
@@ -377,10 +447,13 @@ const chartOption = computed(() => ({
     roam: true,
     draggable: true,
     force: {
-      repulsion: 300,
-      edgeLength: [100, 200],
+      repulsion: viewMode.value === 'system' ? 400 : 200,
+      edgeLength: [80, 150],
       gravity: 0.1,
       layoutAnimation: true
+    },
+    circular: {
+      rotate: 'none'
     },
     emphasis: {
       focus: 'adjacency',
@@ -439,6 +512,23 @@ function getStatusType(status: string): string {
 
 function getPercentage(value: number, total: number): number {
   return total > 0 ? Math.round((value / total) * 100) : 0
+}
+
+// Node styling based on view mode
+function getNodeSymbol(node: any, mode: string): string {
+  if (node.type === 'system') {
+    return mode === 'system' ? 'diamond' : 'circle'
+  } else {
+    return mode === 'package' ? 'roundRect' : 'rect'
+  }
+}
+
+function getNodeSize(node: any, mode: string): number | [number, number] {
+  if (node.type === 'system') {
+    return mode === 'system' ? 60 : 50
+  } else {
+    return mode === 'package' ? [70, 45] : [55, 35]
+  }
 }
 
 // Load data
@@ -559,6 +649,7 @@ function resetFilters() {
 
 onMounted(() => {
   loadGraph()
+  document.addEventListener('fullscreenchange', handleFullscreenChange)
 })
 </script>
 
@@ -635,22 +726,25 @@ onMounted(() => {
         margin-bottom: var(--space-sm);
 
         .legend-symbol {
-          width: 16px;
-          height: 16px;
+          width: 18px;
+          height: 18px;
+          border-radius: 4px;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
           &.system {
             border-radius: 50%;
-            background: #5470c6;
+            background: #32325d;
           }
 
           &.package {
-            border-radius: 2px;
+            border-radius: 4px;
           }
         }
 
         .legend-label {
           font-size: var(--font-size-xs);
           color: var(--color-text-secondary);
+          font-weight: 300;
         }
       }
     }
@@ -712,6 +806,82 @@ onMounted(() => {
       padding: var(--space-sm) var(--space-md);
       border-top: 1px solid var(--color-border-light);
       text-align: center;
+    }
+
+    // Fullscreen detail overlay
+    .detail-overlay {
+      position: absolute;
+      right: 20px;
+      top: 60px;
+      width: 300px;
+      max-height: calc(100vh - 120px);
+      background: var(--color-bg-card);
+      border-radius: var(--radius-xl);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+      z-index: 10001;
+      display: flex;
+      flex-direction: column;
+      animation: slideIn 0.3s ease;
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateX(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .overlay-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--space-md) var(--space-lg);
+        border-bottom: 1px solid var(--color-border-light);
+
+        .overlay-title {
+          font-size: var(--font-size-sm);
+          font-weight: var(--font-weight-semibold);
+          color: var(--color-text-primary);
+        }
+      }
+
+      .overlay-content {
+        padding: var(--space-md) var(--space-lg);
+        overflow-y: auto;
+        flex: 1;
+
+        .detail-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: var(--space-xs) 0;
+          border-bottom: 1px solid var(--color-border-light);
+
+          &:last-child {
+            border-bottom: none;
+          }
+
+          label {
+            font-size: var(--font-size-xs);
+            color: var(--color-text-secondary);
+          }
+
+          span {
+            font-size: var(--font-size-xs);
+            color: var(--color-text-primary);
+            font-weight: var(--font-weight-medium);
+          }
+        }
+      }
+
+      .overlay-actions {
+        padding: var(--space-md) var(--space-lg);
+        border-top: 1px solid var(--color-border-light);
+      }
     }
   }
 

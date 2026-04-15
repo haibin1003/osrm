@@ -105,6 +105,9 @@
             <el-button @click="refreshGraph" title="刷新">
               <el-icon><Refresh /></el-icon>
             </el-button>
+            <el-button @click="toggleScatter" :type="isScattered ? 'warning' : 'default'" title="散开/聚拢">
+              <el-icon><Operation /></el-icon>
+            </el-button>
           </el-button-group>
         </div>
 
@@ -116,6 +119,7 @@
             autoresize
             @click="handleChartClick"
             @dblclick="handleChartDblClick"
+            @mouseup="handleChartMouseUp"
           />
         </div>
 
@@ -153,9 +157,18 @@
               </div>
             </template>
           </div>
+          <div class="overlay-section" v-if="nodeDetails && nodeDetails.length > 0">
+            <h4 class="overlay-section-title">{{ selectedNode.type === 'system' ? '依赖软件' : '使用系统' }}</h4>
+            <div class="overlay-relation-list">
+              <div v-for="item in nodeDetails" :key="item.id" class="overlay-relation-item">
+                <span class="relation-name">{{ item.name }}</span>
+                <el-tag size="small" v-if="item.version">v{{ item.version }}</el-tag>
+              </div>
+            </div>
+          </div>
           <div class="overlay-actions">
             <el-button type="primary" size="small" @click="selectedNode.type === 'system' ? loadSystemDependencies() : loadPackageImpact()">
-              查看详情
+              {{ nodeDetails && nodeDetails.length > 0 ? '刷新' : '查看详情' }}
             </el-button>
           </div>
         </div>
@@ -316,8 +329,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed } from 'vue'
-import { Refresh, FullScreen, InfoFilled, Pointer, ZoomIn, ZoomOut, FullScreen as FullScreenIcon, Close } from '@element-plus/icons-vue'
+import { ref, reactive, onMounted, computed, nextTick } from 'vue'
+import { Refresh, FullScreen, InfoFilled, Pointer, ZoomIn, ZoomOut, FullScreen as FullScreenIcon, Close, Operation } from '@element-plus/icons-vue'
 import { trackingApi, type RelationshipGraph, type SystemNode, type PackageNode, type GraphNode } from '@/api/tracking'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
@@ -348,24 +361,25 @@ const impactDialogVisible = ref(false)
 const impactData = ref<any>(null)
 const chartRef = ref<any>(null)
 const isFullscreen = ref(false)
+const isScattered = ref(false)
 
 // Listen for fullscreen changes
 function handleFullscreenChange() {
   isFullscreen.value = !!document.fullscreenElement
 }
 
-// Type colors - Stripe vibrant colors
+// Type colors - Bright modern vibrant palette
 const typeColors: Record<string, string> = {
-  'DOCKER_IMAGE': '#635bff',  // Stripe Purple
-  'HELM_CHART': '#24b47e',   // Stripe Green
-  'MAVEN': '#e25950',        // Stripe Coral Red
-  'NPM': '#d97706',          // Stripe Orange
-  'PYPI': '#3ba272',         // Teal
-  'GENERIC': '#a259ff'        // Stripe Light Purple
+  'DOCKER_IMAGE': '#00D9FF',  // Bright Cyan
+  'HELM_CHART': '#00E676',   // Bright Mint Green
+  'MAVEN': '#FF5252',        // Bright Coral Red
+  'NPM': '#FFAB40',          // Bright Amber
+  'PYPI': '#E040FB',         // Bright Magenta
+  'GENERIC': '#40C4FF'       // Light Sky Blue
 }
 
-// System node color
-const systemColor = '#635bff'  // Stripe Purple for systems
+// System node color - Bright Violet
+const systemColor = '#7C4DFF'
 
 // Filter nodes and edges based on view mode
 const filteredNodes = computed(() => {
@@ -447,8 +461,8 @@ const chartOption = computed(() => ({
     roam: true,
     draggable: true,
     force: {
-      repulsion: viewMode.value === 'system' ? 400 : 200,
-      edgeLength: [80, 150],
+      repulsion: isScattered.value ? 2000 : (viewMode.value === 'system' ? 400 : 200),
+      edgeLength: isScattered.value ? [200, 400] : [80, 150],
       gravity: 0.1,
       layoutAnimation: true
     },
@@ -592,6 +606,18 @@ function handleChartDblClick(params: any) {
   }
 }
 
+function handleChartMouseUp(params: any) {
+  // Handle mouse up to capture click events on graph nodes
+  // This is a fallback in case @click doesn't work
+  if (params && params.data && params.data.type) {
+    selectedNode.value = params.data as SystemNode | PackageNode
+    nodeDetails.value = []
+    if (params.data.type === 'system') {
+      loadSystemDependencies()
+    }
+  }
+}
+
 function focusNode(nodeId: string) {
   // Highlight the node in chart
   const chart = chartRef.value?.chart
@@ -640,6 +666,16 @@ function refreshGraph() {
   loadGraph()
 }
 
+function toggleScatter() {
+  isScattered.value = !isScattered.value
+  // Trigger chart update by toggling viewMode briefly
+  const currentMode = viewMode.value
+  viewMode.value = ''
+  nextTick(() => {
+    viewMode.value = currentMode
+  })
+}
+
 function resetFilters() {
   filters.domain = ''
   filters.softwareType = ''
@@ -650,6 +686,28 @@ function resetFilters() {
 onMounted(() => {
   loadGraph()
   document.addEventListener('fullscreenchange', handleFullscreenChange)
+
+  // Bind ECharts native click event via chart.on()
+  nextTick(() => {
+    const chartInstance = chartRef.value?.chart
+    if (chartInstance) {
+      // Get the actual ECharts instance
+      const echarts = chartInstance._rawValue || chartInstance
+
+      // Use ECharts' on() to bind click event to graph nodes
+      if (echarts.on) {
+        echarts.on('click', (params: any) => {
+          if (params.dataType === 'node' && params.data) {
+            selectedNode.value = params.data as SystemNode | PackageNode
+            nodeDetails.value = []
+            if (params.data.type === 'system') {
+              loadSystemDependencies()
+            }
+          }
+        })
+      }
+    }
+  })
 })
 </script>
 
@@ -726,17 +784,20 @@ onMounted(() => {
         margin-bottom: var(--space-sm);
 
         .legend-symbol {
-          width: 18px;
-          height: 18px;
-          border-radius: 4px;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          width: 24px;
+          height: 24px;
+          border-radius: 6px;
+          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
 
           &.system {
             border-radius: 50%;
+            border: 3px solid #fff;
+            box-shadow: 0 2px 8px rgba(103, 58, 183, 0.4);
           }
 
           &.package {
-            border-radius: 4px;
+            border-radius: 6px;
+            border: 2px solid rgba(255,255,255,0.8);
           }
         }
 
@@ -880,6 +941,34 @@ onMounted(() => {
       .overlay-actions {
         padding: var(--space-md) var(--space-lg);
         border-top: 1px solid var(--color-border-light);
+      }
+
+      .overlay-section {
+        padding: var(--space-md) var(--space-lg);
+        border-top: 1px solid var(--color-border-light);
+
+        .overlay-section-title {
+          font-size: var(--font-size-xs);
+          color: var(--color-text-secondary);
+          margin-bottom: var(--space-sm);
+        }
+
+        .overlay-relation-list {
+          max-height: 200px;
+          overflow-y: auto;
+
+          .overlay-relation-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-xs) 0;
+
+            .relation-name {
+              font-size: var(--font-size-xs);
+              color: var(--color-text-primary);
+            }
+          }
+        }
       }
     }
   }

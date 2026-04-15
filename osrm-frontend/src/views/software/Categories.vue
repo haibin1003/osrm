@@ -8,7 +8,7 @@
       <el-button type="primary" @click="showDialog('add')"><el-icon><Plus /></el-icon>新增分类</el-button>
     </div>
 
-    <el-card class="table-card stripe-card" shadow="never">
+    <div class="table-card stripe-card">
       <el-table v-loading="loading" :data="treeData" row-key="id" default-expand-all stripe>
         <el-table-column prop="categoryName" label="分类名称" min-width="180" />
         <el-table-column prop="categoryCode" label="分类编码" width="160" />
@@ -24,7 +24,7 @@
           </template>
         </el-table-column>
       </el-table>
-    </el-card>
+    </div>
 
     <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px" @close="resetForm">
       <el-form ref="formRef" :model="formData" :rules="formRules" label-width="100px">
@@ -182,10 +182,6 @@ onMounted(() => loadData())
       height: 3px;
       background: linear-gradient(135deg, #635bff, #a259ff);
     }
-  }
-}
-</style>-weight: var(--font-weight-bold); margin: 0; color: var(--color-text-primary); }
-    .page-subtitle { font-size: var(--font-size-md); color: var(--color-text-secondary); margin: var(--space-xs) 0 0; }
   }
 }
 </style>

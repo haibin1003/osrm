@@ -1,7 +1,7 @@
 <template>
   <div class="user-management">
     <!-- 搜索栏 -->
-    <div class="stripe-card search-card" shadow="never">
+    <div class="stripe-card search-card">
       <el-form :model="searchForm" inline>
         <el-form-item label="用户名">
           <el-input v-model="searchForm.username" placeholder="请输入用户名" clearable />
@@ -25,15 +25,13 @@
     </div>
 
     <!-- 操作栏 -->
-    <div class="stripe-card table-card" shadow="never">
-      <template #header>
-        <div class="card-header">
-          <span class="title">用户列表</span>
-          <el-button type="primary" @click="handleAdd">
-            <el-icon><Plus /></el-icon>新增用户
-          </el-button>
-        </div>
-      </template>
+    <div class="stripe-card table-card">
+      <div class="card-header">
+        <span class="title">用户列表</span>
+        <el-button type="primary" @click="handleAdd">
+          <el-icon><Plus /></el-icon>新增用户
+        </el-button>
+      </div>
 
       <!-- 表格 -->
       <el-table

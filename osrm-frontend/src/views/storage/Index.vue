@@ -350,13 +350,6 @@ onMounted(() => {
   z-index: 1000;
 }
 
-/* Stripe white card */
-.stripe-card {
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-}
-
 .page-header {
   display: flex;
   justify-content: space-between;
@@ -502,31 +495,6 @@ onMounted(() => {
     align-items: center;
     padding-top: 16px;
     border-top: 1px solid #e5e7eb;
-
-    .health-status {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .card-actions {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-  }
-}
-
-/* Stripe status badge */
-.status-badge {
-  font-weight: 300;
-}
-
-.pagination-wrapper {
-  display: flex;
-  justify-content: flex-end;
-}
-</style> 1px solid #e5e7eb;
 
     .health-status {
       display: flex;

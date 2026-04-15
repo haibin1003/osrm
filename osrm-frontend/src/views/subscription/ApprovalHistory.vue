@@ -37,11 +37,9 @@
     </div>
 
     <div class="table-card stripe-card">
-      <template #header>
-        <div class="card-header">
-          <span class="title">审批历史</span>
-        </div>
-      </template>
+      <div class="card-header">
+        <span class="title">审批历史</span>
+      </div>
 
       <el-table v-loading="loading" :data="historyList" stripe border style="width: 100%">
         <el-table-column type="index" width="50" align="center" />
@@ -79,7 +77,7 @@
         />
       </div>
     </div>
-    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -169,10 +167,22 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .approval-history {
+  padding: 24px;
+  background: var(--color-bg-page);
+  min-height: 100vh;
+
+  &::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(135deg, #635bff, #a259ff);
+    z-index: 1000;
+  }
+
   .page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
     margin-bottom: var(--space-xl);
     .page-title {
       font-size: var(--font-size-3xl);
@@ -205,13 +215,28 @@ onMounted(() => {
       height: 3px;
       background: linear-gradient(135deg, #635bff, #a259ff);
     }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-md) var(--space-lg);
+      border-bottom: 1px solid var(--color-border-light);
+
+      .title {
+        font-size: var(--font-size-base);
+        font-weight: var(--font-weight-normal);
+        color: var(--color-text-primary);
+      }
+    }
   }
 
   .search-card {
     background: var(--color-bg-card);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
-    overflow: hidden;
+    padding: var(--space-lg);
+    margin-bottom: var(--space-lg);
     position: relative;
 
     &::before {

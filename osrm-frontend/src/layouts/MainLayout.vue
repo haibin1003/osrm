@@ -197,7 +197,7 @@ const visibleMenus = computed(() => {
   const userPermissions = authStore.userInfo?.permissions || []
 
   const hasPermission = (perm?: string) => {
-    if (!perm) return false // 没有权限要求的菜单默认不显示
+    if (!perm) return true // 没有权限要求的菜单默认显示
     return userPermissions.includes(perm)
   }
 

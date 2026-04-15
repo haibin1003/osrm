@@ -124,7 +124,7 @@
         </div>
 
         <!-- 全屏模式详情浮层 -->
-        <div class="detail-overlay" v-if="selectedNode && isFullscreen">
+        <div class="detail-overlay" v-if="selectedNode && isFullscreen && !impactDialogVisible">
           <div class="overlay-header">
             <span class="overlay-title">{{ selectedNode.type === 'system' ? '业务系统详情' : '软件包详情' }}</span>
             <el-button text @click="selectedNode = null">

@@ -52,7 +52,7 @@
           <h3 class="panel-title">图例</h3>
           <div class="legend-list">
             <div class="legend-item">
-              <span class="legend-symbol system"></span>
+              <span class="legend-symbol system" :style="{ background: systemColor }"></span>
               <span class="legend-label">业务系统</span>
             </div>
             <div class="legend-item" v-for="(color, type) in typeColors" :key="type">
@@ -365,7 +365,7 @@ const typeColors: Record<string, string> = {
 }
 
 // System node color
-const systemColor = '#32325d'  // Stripe Dark Text
+const systemColor = '#635bff'  // Stripe Purple for systems
 
 // Filter nodes and edges based on view mode
 const filteredNodes = computed(() => {
@@ -733,7 +733,6 @@ onMounted(() => {
 
           &.system {
             border-radius: 50%;
-            background: #32325d;
           }
 
           &.package {

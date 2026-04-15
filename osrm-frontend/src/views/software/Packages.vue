@@ -222,6 +222,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import { Plus, Search } from '@element-plus/icons-vue'
@@ -232,6 +233,7 @@ import { useAuthStore } from '@/stores/modules/auth'
 import type { SoftwarePackage, SoftwareVersion, PackageForm, VersionForm } from '@/types/software'
 
 const authStore = useAuthStore()
+const route = useRoute()
 
 // 权限检查
 const canCreate = computed(() => authStore.hasPermission('package:create'))
@@ -459,6 +461,10 @@ const formatSize = (bytes: number) => {
 
 onMounted(async () => {
   loadData()
+  // 检查是否有预操作参数
+  if (route.query.action === 'create' && canCreate.value) {
+    showCreateDialog()
+  }
   // 只有有存储权限的用户才加载存储后端列表
   if (canManageStorage.value) {
     try {

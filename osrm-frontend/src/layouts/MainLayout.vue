@@ -142,8 +142,7 @@ const menus = [
     permission: 'package:read',
     children: [
       { title: '软件包', items: [
-        { title: '软件包列表', path: '/software/packages', permission: 'package:read' },
-        { title: '新增软件包', path: '/software/packages/create', permission: 'package:create' }
+        { title: '软件包列表', path: '/software/packages', permission: 'package:read' }
       ]},
       { title: '分类', items: [
         { title: '软件分类', path: '/software/categories', permission: 'package:read' },
@@ -152,11 +151,14 @@ const menus = [
     ]
   },
   {
+    title: '关联图', path: '/tracking/relationship-graph', icon: 'Connection',
+    permission: 'system:manage'
+  },
+  {
     title: '订购管理', path: '/subscription', icon: 'ShoppingCart',
     children: [
       { title: '', items: [
         { title: '我的订购', path: '/subscription/my', permission: 'subscription:read' },
-        { title: '申请订购', path: '/subscription/apply', permission: 'subscription:create' },
         { title: '待审批', path: '/subscription/pending', permission: 'subscription:approve' },
         { title: '审批历史', path: '/subscription/history', permission: 'subscription:read' }
       ]}
@@ -184,9 +186,6 @@ const menus = [
         { title: '存储配置', path: '/system/storage', permission: 'storage:read' },
         { title: '系统设置', path: '/system/settings', permission: 'system:manage' },
         { title: '使用统计', path: '/stats', permission: 'system:manage' }
-      ]},
-      { title: '使用追踪', items: [
-        { title: '关联图', path: '/tracking/relationship-graph', permission: 'system:manage' }
       ]}
     ]
   }

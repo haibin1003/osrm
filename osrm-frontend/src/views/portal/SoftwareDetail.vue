@@ -281,12 +281,12 @@ const requireAuth = (target: string) => {
 }
 
 const handleSubscribe = () => {
-  const target = `/subscription/apply?packageId=${packageId}`
+  const target = `/subscription/my?apply=true&packageId=${packageId}`
   if (requireAuth(target)) router.push(target)
 }
 
 const handleSubscribeVersion = (ver: SoftwareVersion) => {
-  const target = `/subscription/apply?packageId=${packageId}&versionId=${ver.id}`
+  const target = `/subscription/my?apply=true&packageId=${packageId}&versionId=${ver.id}`
   if (requireAuth(target)) router.push(target)
 }
 

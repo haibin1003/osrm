@@ -51,11 +51,11 @@
           <span class="quick-title">快捷操作</span>
         </div>
         <div class="quick-buttons">
-          <el-button v-if="canCreatePackage" type="primary" plain @click="$router.push('/software/packages/create')">
+          <el-button v-if="canCreatePackage" type="primary" plain @click="$router.push('/software/packages?action=create')">
             <el-icon><Plus /></el-icon>
             新建软件包
           </el-button>
-          <el-button v-if="canApplySubscription" type="primary" plain @click="$router.push('/subscription/apply')">
+          <el-button v-if="canApplySubscription" type="primary" plain @click="$router.push('/subscription/my?apply=true')">
             <el-icon><ShoppingCart /></el-icon>
             申请订购
           </el-button>

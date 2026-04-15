@@ -57,12 +57,6 @@ const routes: RouteRecordRaw[] = [
         meta: { title: '软件包列表' }
       },
       {
-        path: 'software/packages/create',
-        name: 'PackageCreate',
-        component: () => import('@/views/software/PackageCreate.vue'),
-        meta: { title: '新增软件包' }
-      },
-      {
         path: 'software/versions',
         name: 'VersionManagement',
         component: () => import('@/views/software/VersionManagement.vue'),
@@ -86,12 +80,6 @@ const routes: RouteRecordRaw[] = [
         name: 'MySubscriptions',
         component: () => import('@/views/subscription/MySubscriptions.vue'),
         meta: { title: '我的订购' }
-      },
-      {
-        path: 'subscription/apply',
-        name: 'ApplySubscription',
-        component: () => import('@/views/subscription/ApplySubscription.vue'),
-        meta: { title: '申请订购' }
       },
       {
         path: 'subscription/pending',

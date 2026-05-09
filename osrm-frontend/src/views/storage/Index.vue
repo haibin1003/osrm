@@ -334,7 +334,7 @@ onMounted(() => {
 <style scoped lang="scss">
 .storage-backend-page {
   padding: var(--space-lg);
-  background: #f6f9fc;
+  background: var(--color-bg-page);
   min-height: 100vh;
 }
 
@@ -346,7 +346,7 @@ onMounted(() => {
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(135deg, #635bff, #a259ff);
+  background: var(--color-primary);
   z-index: 1000;
 }
 

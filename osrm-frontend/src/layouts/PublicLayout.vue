@@ -69,7 +69,7 @@ const authStore = useAuthStore()
   .brand-icon {
     width: 32px;
     height: 32px;
-    background: linear-gradient(135deg, #635bff, #a259ff);
+    background: var(--color-primary);
     border-radius: var(--radius-md);
     display: flex;
     align-items: center;

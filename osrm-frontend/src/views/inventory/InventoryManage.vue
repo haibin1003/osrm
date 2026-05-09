@@ -1,6 +1,6 @@
 <template>
   <div class="inventory-manage">
-    <div class="table-card stripe-card">
+    <div class="table-card content-card">
       <div class="table-header">
         <h2 class="table-title">存量管理设置</h2>
         <p class="table-subtitle">配置存量登记功能参数</p>
@@ -226,7 +226,7 @@ onMounted(() => {
     left: 0;
     right: 0;
     height: 3px;
-    background: linear-gradient(135deg, #635bff, #a259ff);
+    background: var(--color-primary);
   }
 }
 

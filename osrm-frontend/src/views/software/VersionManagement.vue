@@ -156,7 +156,7 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .version-management {
-  background: #f6f9fc;
+  background: var(--color-bg-page);
   min-height: calc(100vh - 120px);
   padding: var(--space-xl);
 
@@ -176,7 +176,7 @@ onMounted(() => {
       left: 0;
       right: 0;
       height: 3px;
-      background: linear-gradient(135deg, #635bff, #a259ff);
+      background: var(--color-primary);
     }
 
     :deep(.el-form-item) {
@@ -198,7 +198,7 @@ onMounted(() => {
       left: 0;
       right: 0;
       height: 3px;
-      background: linear-gradient(135deg, #635bff, #a259ff);
+      background: var(--color-primary);
     }
 
     .card-header {

@@ -7,6 +7,7 @@ import com.osrm.application.software.dto.response.SoftwarePackageDTO;
 import com.osrm.application.software.dto.response.SoftwareVersionDTO;
 import com.osrm.common.exception.BizException;
 import com.osrm.common.model.PageResult;
+import com.osrm.common.util.HtmlSanitizer;
 import com.osrm.domain.software.entity.*;
 import com.osrm.domain.software.repository.SoftwarePackageRepository;
 import com.osrm.domain.software.repository.SoftwareVersionRepository;
@@ -115,14 +116,14 @@ public class SoftwarePackageAppService {
         }
 
         SoftwarePackage pkg = new SoftwarePackage();
-        pkg.setPackageName(request.getPackageName());
+        pkg.setPackageName(HtmlSanitizer.sanitizeText(request.getPackageName()));
         pkg.setPackageKey(request.getPackageKey());
         pkg.setSoftwareType(request.getSoftwareType());
         // 如果没有提供 categoryId，使用默认分类（开发工具）
         pkg.setCategoryId(request.getCategoryId() != null ? request.getCategoryId() : 1L);
-        pkg.setDescription(request.getDescription());
+        pkg.setDescription(HtmlSanitizer.sanitizeText(request.getDescription()));
         pkg.setWebsiteUrl(request.getWebsiteUrl());
-        pkg.setLicenseType(request.getLicenseType());
+        pkg.setLicenseType(HtmlSanitizer.sanitizeText(request.getLicenseType()));
         pkg.setLicenseUrl(request.getLicenseUrl());
         pkg.setSourceUrl(request.getSourceUrl());
         pkg.setCreatedBy(createdBy);
@@ -156,11 +157,11 @@ public class SoftwarePackageAppService {
                     });
         }
 
-        pkg.setPackageName(request.getPackageName());
+        pkg.setPackageName(HtmlSanitizer.sanitizeText(request.getPackageName()));
         pkg.setCategoryId(request.getCategoryId());
-        pkg.setDescription(request.getDescription());
+        pkg.setDescription(HtmlSanitizer.sanitizeText(request.getDescription()));
         pkg.setWebsiteUrl(request.getWebsiteUrl());
-        pkg.setLicenseType(request.getLicenseType());
+        pkg.setLicenseType(HtmlSanitizer.sanitizeText(request.getLicenseType()));
         pkg.setLicenseUrl(request.getLicenseUrl());
         pkg.setSourceUrl(request.getSourceUrl());
 

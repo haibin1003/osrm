@@ -18,11 +18,11 @@ export function initTheme(): void {
 function applyTheme(dark: boolean): void {
   isDark.value = dark
   const html = document.documentElement
+  // Always set explicit data-theme so CSS selectors and tests can detect both states
+  html.setAttribute('data-theme', dark ? 'dark' : 'light')
   if (dark) {
-    html.setAttribute('data-theme', 'dark')
     html.classList.add('dark')
   } else {
-    html.removeAttribute('data-theme')
     html.classList.remove('dark')
   }
   localStorage.setItem(THEME_KEY, dark ? 'dark' : 'light')

@@ -1,6 +1,6 @@
 <template>
   <div class="inventory-create">
-    <div class="form-card stripe-card">
+    <div class="form-card content-card">
       <div class="form-header">
         <h2 class="form-title">存量软件登记</h2>
         <p class="form-subtitle">登记存量系统已使用的开源软件</p>
@@ -231,7 +231,7 @@ onMounted(() => {
     left: 0;
     right: 0;
     height: 3px;
-    background: linear-gradient(135deg, #635bff, #a259ff);
+    background: var(--color-primary);
   }
 }
 

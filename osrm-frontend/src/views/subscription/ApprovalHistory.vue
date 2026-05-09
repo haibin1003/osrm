@@ -36,7 +36,7 @@
       </el-form>
     </div>
 
-    <div class="table-card stripe-card">
+    <div class="table-card content-card">
       <div class="card-header">
         <span class="title">审批历史</span>
       </div>
@@ -178,7 +178,7 @@ onMounted(() => {
     left: 0;
     right: 0;
     height: 3px;
-    background: linear-gradient(135deg, #635bff, #a259ff);
+    background: var(--color-primary);
     z-index: 1000;
   }
 
@@ -199,7 +199,7 @@ onMounted(() => {
     }
   }
 
-  .stripe-card {
+  .content-card {
     background: var(--color-bg-card);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
@@ -213,7 +213,7 @@ onMounted(() => {
       left: 0;
       right: 0;
       height: 3px;
-      background: linear-gradient(135deg, #635bff, #a259ff);
+      background: var(--color-primary);
     }
 
     .card-header {
@@ -246,7 +246,7 @@ onMounted(() => {
       left: 0;
       right: 0;
       height: 3px;
-      background: linear-gradient(135deg, #635bff, #a259ff);
+      background: var(--color-primary);
     }
   }
 

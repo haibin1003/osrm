@@ -290,7 +290,7 @@ const handleCommand = async (command: string) => {
   .brand-icon {
     width: 32px;
     height: 32px;
-    background: linear-gradient(135deg, #635bff, #a259ff);
+    background: var(--color-primary);
     border-radius: var(--radius-md);
     display: flex;
     align-items: center;
@@ -461,7 +461,7 @@ const handleCommand = async (command: string) => {
 }
 
 .user-avatar {
-  background: linear-gradient(135deg, #635bff, #a259ff);
+  background: var(--color-primary);
   color: white;
   font-weight: var(--font-weight-semibold);
   font-size: var(--font-size-xs);

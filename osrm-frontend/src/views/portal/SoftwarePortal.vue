@@ -186,14 +186,16 @@ onMounted(() => {
 <style scoped lang="scss">
 .software-portal {
   .portal-header {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-left: 4px solid var(--color-primary);
     border-radius: var(--radius-xl);
     padding: 48px 40px;
     margin-bottom: var(--space-xl);
     .header-content {
       max-width: 600px;
-      h1 { font-size: var(--font-size-3xl); font-weight: 700; color: #fff; margin: 0 0 8px; }
-      p { color: rgba(255,255,255,0.7); font-size: var(--font-size-lg); margin: 0 0 24px; }
+      h1 { font-size: var(--font-size-3xl); font-weight: 700; color: var(--color-text-primary); margin: 0 0 8px; }
+      p { color: var(--color-text-secondary); font-size: var(--font-size-lg); margin: 0 0 24px; }
       .search-input { max-width: 480px; }
     }
   }

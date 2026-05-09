@@ -8,7 +8,7 @@
       <el-button type="primary" @click="dialogVisible = true"><el-icon><Plus /></el-icon>新增标签</el-button>
     </div>
 
-    <el-card class="table-card stripe-card" shadow="never">
+    <el-card class="table-card content-card" shadow="never">
       <el-table v-loading="loading" :data="tagList" stripe>
         <el-table-column prop="tagName" label="标签名称" min-width="150">
           <template #default="{ row }">
@@ -108,7 +108,7 @@ onMounted(() => loadData())
 
 <style scoped lang="scss">
 .tags-page {
-  background: #f6f9fc;
+  background: var(--color-bg-page);
   min-height: calc(100vh - 120px);
   padding: var(--space-xl);
 
@@ -146,7 +146,7 @@ onMounted(() => loadData())
       left: 0;
       right: 0;
       height: 3px;
-      background: linear-gradient(135deg, #635bff, #a259ff);
+      background: var(--color-primary);
     }
   }
 }

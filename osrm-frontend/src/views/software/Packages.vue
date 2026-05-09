@@ -9,7 +9,7 @@
     </div>
 
     <!-- 搜索 (Stripe style card) -->
-    <div class="search-card stripe-card">
+    <div class="search-card content-card">
       <el-form :model="searchForm" inline>
         <el-form-item label="关键词">
           <el-input v-model="searchForm.keyword" placeholder="包名/包标识" clearable />
@@ -40,7 +40,7 @@
     </div>
 
     <!-- 表格 -->
-    <div class="table-card stripe-card">
+    <div class="table-card content-card">
       <el-table v-loading="loading" :data="tableData">
         <el-table-column prop="packageName" label="包名" min-width="150" />
         <el-table-column prop="packageKey" label="包标识" min-width="150" />
@@ -513,7 +513,7 @@ onMounted(async () => {
       left: 0;
       right: 0;
       height: 3px;
-      background: linear-gradient(135deg, #635bff, #a259ff);
+      background: var(--color-primary);
     }
 
     :deep(.el-form-item) {
@@ -539,7 +539,7 @@ onMounted(async () => {
       left: 0;
       right: 0;
       height: 3px;
-      background: linear-gradient(135deg, #635bff, #a259ff);
+      background: var(--color-primary);
     }
   }
 

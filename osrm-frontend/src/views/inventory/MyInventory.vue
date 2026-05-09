@@ -1,6 +1,6 @@
 <template>
   <div class="my-inventory">
-    <div class="table-card stripe-card">
+    <div class="table-card content-card">
       <div class="table-header">
         <div class="header-content">
           <h2 class="table-title">我的存量登记</h2>
@@ -204,7 +204,7 @@ onMounted(() => {
     left: 0;
     right: 0;
     height: 3px;
-    background: linear-gradient(135deg, #635bff, #a259ff);
+    background: var(--color-primary);
   }
 }
 

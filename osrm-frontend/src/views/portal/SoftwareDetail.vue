@@ -167,12 +167,12 @@ const typeColorMap: Record<string, string> = {
 const getTypeColor = (type: string) => typeColorMap[type] || 'info'
 
 const typeGradient: Record<string, string> = {
-  'DOCKER_IMAGE': 'linear-gradient(135deg, #1e3a5f 0%, #0f766e 100%)',
-  'HELM_CHART': 'linear-gradient(135deg, #1e3a5f 0%, #0ea5e9 100%)',
-  'MAVEN': 'linear-gradient(135deg, #3f2c22 0%, #c2410c 100%)',
-  'NPM': 'linear-gradient(135deg, #3f2c22 0%, #dc2626 100%)',
-  'PYPI': 'linear-gradient(135deg, #1e3a5f 0%, #16a34a 100%)',
-  'GENERIC': 'linear-gradient(135deg, #1a1a2e 0%, #4b5563 100%)'
+  'DOCKER_IMAGE': '#06B6D4',
+  'HELM_CHART': '#10B981',
+  'MAVEN': '#F97316',
+  'NPM': '#EF4444',
+  'PYPI': '#8B5CF6',
+  'GENERIC': '#6B7280'
 }
 
 const downloadCommands = computed(() => {
@@ -313,17 +313,18 @@ onMounted(async () => {
   .page-header { margin-bottom: var(--space-lg); }
 
   .hero-section {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
     border-radius: var(--radius-xl);
     padding: var(--space-3xl);
     margin-bottom: var(--space-2xl);
-    color: white;
+    color: var(--color-text-primary);
 
-    &.type-docker_image { background: linear-gradient(135deg, #1e3a5f 0%, #0f766e 100%); }
-    &.type-helm_chart { background: linear-gradient(135deg, #1e3a5f 0%, #0ea5e9 100%); }
-    &.type-maven { background: linear-gradient(135deg, #3f2c22 0%, #c2410c 100%); }
-    &.type-npm { background: linear-gradient(135deg, #3f2c22 0%, #dc2626 100%); }
-    &.type-pypi { background: linear-gradient(135deg, #1e3a5f 0%, #16a34a 100%); }
+    &.type-docker_image { border-left: 4px solid #06B6D4; }
+    &.type-helm_chart { border-left: 4px solid #10B981; }
+    &.type-maven { border-left: 4px solid #F97316; }
+    &.type-npm { border-left: 4px solid #EF4444; }
+    &.type-pypi { border-left: 4px solid #8B5CF6; }
 
     .hero-content {
       display: flex;
@@ -348,19 +349,19 @@ onMounted(async () => {
     .pkg-icon {
       width: 80px;
       height: 80px;
-      background: rgba(255,255,255,0.2);
+      background: var(--color-primary-subtle);
       border-radius: var(--radius-xl);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: var(--font-size-4xl);
       font-weight: var(--font-weight-bold);
-      backdrop-filter: blur(10px);
+      color: var(--color-primary);
     }
 
-    .name { font-size: var(--font-size-3xl); font-weight: var(--font-weight-bold); margin: 0 0 var(--space-md); }
+    .name { font-size: var(--font-size-3xl); font-weight: var(--font-weight-bold); color: var(--color-text-primary); margin: 0 0 var(--space-md); }
     .tags { display: flex; gap: var(--space-sm); margin-bottom: var(--space-md); }
-    .desc { font-size: var(--font-size-md); opacity: 0.9; margin: 0; max-width: 500px; line-height: 1.5; }
+    .desc { font-size: var(--font-size-md); color: var(--color-text-secondary); margin: 0; max-width: 500px; line-height: 1.5; }
 
     .stats-row {
       display: flex;

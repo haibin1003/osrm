@@ -168,7 +168,7 @@ const handleCancel = () => {
 
 <style scoped lang="scss">
 .package-create {
-  background: #f6f9fc;
+  background: var(--color-bg-page);
   min-height: calc(100vh - 120px);
   padding: var(--space-xl);
 
@@ -186,7 +186,7 @@ const handleCancel = () => {
       left: 0;
       right: 0;
       height: 3px;
-      background: linear-gradient(135deg, #635bff, #a259ff);
+      background: var(--color-primary);
     }
 
     .card-header {

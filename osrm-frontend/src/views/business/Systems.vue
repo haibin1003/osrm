@@ -11,7 +11,7 @@
     </div>
 
     <!-- 搜索 -->
-    <div class="search-card stripe-card">
+    <div class="search-card content-card">
       <el-form :model="searchForm" inline>
         <el-form-item label="关键词">
           <el-input v-model="searchForm.keyword" placeholder="系统编码/名称" clearable />
@@ -39,7 +39,7 @@
     </div>
 
     <!-- 表格 -->
-    <div class="table-card stripe-card">
+    <div class="table-card content-card">
       <el-table v-loading="loading" :data="tableData">
         <el-table-column prop="systemCode" label="系统编码" min-width="120" />
         <el-table-column prop="systemName" label="系统名称" min-width="150" />
@@ -268,7 +268,7 @@ onMounted(() => loadData())
       left: 0;
       right: 0;
       height: 3px;
-      background: linear-gradient(135deg, #635bff, #a259ff);
+      background: var(--color-primary);
     }
 
     :deep(.el-form-item) {
@@ -290,7 +290,7 @@ onMounted(() => loadData())
       left: 0;
       right: 0;
       height: 3px;
-      background: linear-gradient(135deg, #635bff, #a259ff);
+      background: var(--color-primary);
     }
   }
 

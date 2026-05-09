@@ -1,14 +1,13 @@
 package com.osrm.application.inventory.dto.request;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 /**
  * 创建存量登记请求
+ * 注意：packageName 与 packageId 至少需要提供一个；优先使用 packageId 关联软件包
  */
 public class CreateInventoryRequest {
 
-    @NotBlank(message = "软件名称不能为空")
     @Size(max = 128, message = "软件名称长度不能超过128")
     private String packageName;
 

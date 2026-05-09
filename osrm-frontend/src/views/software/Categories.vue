@@ -8,7 +8,7 @@
       <el-button type="primary" @click="showDialog('add')"><el-icon><Plus /></el-icon>新增分类</el-button>
     </div>
 
-    <div class="table-card stripe-card">
+    <div class="table-card content-card">
       <el-table v-loading="loading" :data="treeData" row-key="id" default-expand-all stripe>
         <el-table-column prop="categoryName" label="分类名称" min-width="180" />
         <el-table-column prop="categoryCode" label="分类编码" width="160" />
@@ -142,7 +142,7 @@ onMounted(() => loadData())
 
 <style scoped lang="scss">
 .categories-page {
-  background: #f6f9fc;
+  background: var(--color-bg-page);
   min-height: calc(100vh - 120px);
   padding: var(--space-xl);
 
@@ -180,7 +180,7 @@ onMounted(() => loadData())
       left: 0;
       right: 0;
       height: 3px;
-      background: linear-gradient(135deg, #635bff, #a259ff);
+      background: var(--color-primary);
     }
   }
 }

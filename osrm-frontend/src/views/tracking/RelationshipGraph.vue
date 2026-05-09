@@ -368,18 +368,18 @@ function handleFullscreenChange() {
   isFullscreen.value = !!document.fullscreenElement
 }
 
-// Type colors - Bright modern vibrant palette
+// Type colors - Professional muted palette
 const typeColors: Record<string, string> = {
-  'DOCKER_IMAGE': '#00D9FF',  // Bright Cyan
-  'HELM_CHART': '#00E676',   // Bright Mint Green
-  'MAVEN': '#FF5252',        // Bright Coral Red
-  'NPM': '#FFAB40',          // Bright Amber
-  'PYPI': '#E040FB',         // Bright Magenta
-  'GENERIC': '#40C4FF'       // Light Sky Blue
+  'DOCKER_IMAGE': '#06B6D4',  // Cyan-500
+  'HELM_CHART': '#10B981',   // Emerald-500
+  'MAVEN': '#F97316',        // Orange-500
+  'NPM': '#EF4444',          // Red-500
+  'PYPI': '#8B5CF6',         // Violet-500
+  'GENERIC': '#6B7280'       // Gray-500
 }
 
-// System node color - Bright Violet
-const systemColor = '#7C4DFF'
+// System node color - Primary Blue
+const systemColor = '#3B6FF5'
 
 // Filter nodes and edges based on view mode
 const filteredNodes = computed(() => {

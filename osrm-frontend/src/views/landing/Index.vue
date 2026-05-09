@@ -201,10 +201,11 @@ const goToDetail = (id: number) => router.push(`/browse/software/${id}`)
 
 // Hero Section
 .hero {
-  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
-  color: white;
-  padding: 32px 0 24px;
+  background: #FFFFFF;
+  color: var(--color-text-primary);
+  padding: 48px 0 32px;
   text-align: center;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .hero-content {
@@ -238,15 +239,15 @@ const goToDetail = (id: number) => router.push(`/browse/software/${id}`)
 .hero-subtitle {
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
   margin: 0 0 var(--space-xs);
-  opacity: 0.9;
 }
 
 .hero-description {
   font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
   margin: 0 0 var(--space-lg);
-  opacity: 0.8;
-  line-height: 1.4;
+  line-height: 1.6;
   max-width: 480px;
   margin-left: auto;
   margin-right: auto;
@@ -436,8 +437,9 @@ const goToDetail = (id: number) => router.push(`/browse/software/${id}`)
 
 // Footer
 .landing-footer {
-  background: #0f172a;
-  color: white;
+  background: var(--color-bg-subtle);
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
   padding: var(--space-2xl) 0;
 
   .container {

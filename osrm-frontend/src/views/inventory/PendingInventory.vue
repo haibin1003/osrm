@@ -1,6 +1,6 @@
 <template>
   <div class="pending-inventory">
-    <div class="table-card stripe-card">
+    <div class="table-card content-card">
       <div class="table-header">
         <h2 class="table-title">存量登记审批</h2>
         <p class="table-subtitle">待审批的存量登记记录</p>
@@ -199,7 +199,7 @@ onMounted(() => {
     left: 0;
     right: 0;
     height: 3px;
-    background: linear-gradient(135deg, #635bff, #a259ff);
+    background: var(--color-primary);
   }
 }
 

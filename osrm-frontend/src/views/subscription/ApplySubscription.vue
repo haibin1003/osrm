@@ -7,7 +7,7 @@
       </div>
     </div>
 
-    <el-card class="stripe-card form-card">
+    <el-card class="content-card form-card">
       <el-form ref="formRef" :model="formData" :rules="formRules" label-width="120px">
         <el-form-item label="软件包" prop="packageId">
           <el-select v-model="formData.packageId" placeholder="请选择软件包" filterable style="width: 100%"
@@ -159,7 +159,7 @@ onMounted(async () => {
     }
   }
 
-  .stripe-card {
+  .content-card {
     background: var(--color-bg-card);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
@@ -173,7 +173,7 @@ onMounted(async () => {
       left: 0;
       right: 0;
       height: 3px;
-      background: linear-gradient(135deg, #635bff, #a259ff);
+      background: var(--color-primary);
     }
   }
 }

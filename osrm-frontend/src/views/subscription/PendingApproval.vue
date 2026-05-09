@@ -14,7 +14,7 @@
           <span>订购申请 <el-badge v-if="subTotal > 0" :value="subTotal" type="danger" /></span>
         </template>
 
-        <div class="stripe-card">
+        <div class="content-card">
           <el-table v-loading="subLoading" :data="subList" stripe>
             <el-table-column prop="packageName" label="软件包" min-width="150" />
             <el-table-column prop="versionNumber" label="版本" width="100">
@@ -53,7 +53,7 @@
           <span>软件包审批 <el-badge v-if="pkgTotal > 0" :value="pkgTotal" type="danger" /></span>
         </template>
 
-        <div class="stripe-card">
+        <div class="content-card">
           <el-table v-loading="pkgLoading" :data="pkgList" stripe>
             <el-table-column prop="packageName" label="软件包名称" min-width="150" />
             <el-table-column prop="packageKey" label="包标识" min-width="150" />
@@ -197,7 +197,7 @@ onMounted(() => {
     }
   }
 
-  .stripe-card {
+  .content-card {
     background: var(--color-bg-card);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
@@ -211,7 +211,7 @@ onMounted(() => {
       left: 0;
       right: 0;
       height: 3px;
-      background: linear-gradient(135deg, #635bff, #a259ff);
+      background: var(--color-primary);
     }
   }
 

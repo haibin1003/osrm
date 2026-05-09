@@ -11,7 +11,7 @@ import lombok.Data;
 public class CreateRoleRequest {
 
     @NotBlank(message = "角色编码不能为空")
-    @Pattern(regexp = "^ROLE_[A-Z_]+$", message = "角色编码格式必须为ROLE_XXX，全大写")
+    @Pattern(regexp = "^ROLE_[A-Z_]+$", message = "角色编码格式必须为 ROLE_XXX，仅允许大写字母和下划线（不允许数字）")
     private String roleCode;
 
     @NotBlank(message = "角色名称不能为空")

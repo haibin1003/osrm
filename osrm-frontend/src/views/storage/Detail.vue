@@ -228,7 +228,7 @@ onMounted(() => {
 <style scoped lang="scss">
 .storage-detail-page {
   padding: var(--space-lg);
-  background: #f6f9fc;
+  background: var(--color-bg-page);
   min-height: 100vh;
 }
 
@@ -240,12 +240,12 @@ onMounted(() => {
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(135deg, #635bff, #a259ff);
+  background: var(--color-primary);
   z-index: 1000;
 }
 
 /* Stripe white card */
-.stripe-card {
+.content-card {
   background: #fff;
   border-radius: 10px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);

@@ -1,7 +1,7 @@
 <template>
   <div class="role-management">
     <!-- 搜索栏 -->
-    <div class="stripe-card search-card">
+    <div class="content-card search-card">
       <el-form :model="searchForm" inline>
         <el-form-item label="角色名称">
           <el-input v-model="searchForm.roleName" placeholder="请输入角色名称" clearable />
@@ -19,7 +19,7 @@
     </div>
 
     <!-- 操作栏 -->
-    <div class="stripe-card table-card">
+    <div class="content-card table-card">
       <div class="card-header">
         <span class="title">角色列表</span>
         <el-button type="primary" @click="handleAdd">
@@ -397,7 +397,7 @@ onMounted(() => {
 <style scoped lang="scss">
 .role-management {
   padding: 24px;
-  background: #f6f9fc;
+  background: var(--color-bg-page);
   min-height: 100vh;
 
   // Stripe top gradient bar
@@ -408,7 +408,7 @@ onMounted(() => {
     left: 0;
     right: 0;
     height: 3px;
-    background: linear-gradient(135deg, #635bff, #a259ff);
+    background: var(--color-primary);
     z-index: 1000;
   }
 
@@ -419,7 +419,7 @@ onMounted(() => {
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.03);
   }
 
-  .stripe-card {
+  .content-card {
     background: #fff;
     border-radius: 10px;
     padding: 20px;
@@ -464,7 +464,7 @@ onMounted(() => {
       th {
         font-weight: 400;
         color: #32325d;
-        background: #f6f9fc;
+        background: var(--color-bg-page);
       }
     }
 
@@ -476,8 +476,8 @@ onMounted(() => {
       font-weight: 300;
 
       &.status-active {
-        background: rgba(99, 91, 255, 0.1);
-        color: #635bff;
+        background: rgba(59, 111, 245, 0.08);
+        color: var(--color-primary);
       }
 
       &.status-inactive {

@@ -31,7 +31,7 @@
       <div class="stat-card" v-for="(stat, index) in statsConfig" :key="index" :style="{ '--accent-color': stat.color }">
         <div class="stat-bg-gradient"></div>
         <div class="stat-icon-wrapper">
-          <el-icon :size="32" :color="stat.color"><component :is="stat.icon" /></el-icon>
+          <el-icon :size="20" :color="stat.color"><component :is="stat.icon" /></el-icon>
         </div>
         <div class="stat-info">
           <div class="stat-value">{{ stat.value }}</div>
@@ -73,42 +73,42 @@
 
     <!-- 图表区域 -->
     <div class="main-content" :class="{ 'fullscreen-charts': isFullscreen }">
-      <!-- 左侧图表 -->
-      <div class="charts-left">
-        <div class="chart-card stripe-card">
-          <div class="chart-header">
-            <div class="header-left">
-              <span class="chart-title">订购趋势</span>
-              <el-radio-group v-if="!isFullscreen" v-model="trendDays" size="small" @change="loadTrend">
-                <el-radio-button :label="7">近7天</el-radio-button>
-                <el-radio-button :label="14">近14天</el-radio-button>
-                <el-radio-button :label="30">近30天</el-radio-button>
-              </el-radio-group>
-            </div>
+      <!-- 订购趋势 - 全宽 -->
+      <div class="chart-card trend-card">
+        <div class="chart-header">
+          <div class="header-left">
+            <span class="chart-title">订购趋势</span>
+            <el-radio-group v-if="!isFullscreen" v-model="trendDays" size="small" @change="loadTrend">
+              <el-radio-button :label="7">近7天</el-radio-button>
+              <el-radio-button :label="14">近14天</el-radio-button>
+              <el-radio-button :label="30">近30天</el-radio-button>
+            </el-radio-group>
           </div>
-          <div class="trend-summary" v-if="trend.summary && !isFullscreen">
-            <div class="summary-item">
-              <span class="summary-label">总订购</span>
-              <span class="summary-value">{{ trend.summary.totalSubscriptionCount }}</span>
-            </div>
-            <div class="summary-item">
-              <span class="summary-label">已审批</span>
-              <span class="summary-value success">{{ trend.summary.totalApprovedCount }}</span>
-            </div>
-            <div class="summary-item">
-              <span class="summary-label">已拒绝</span>
-              <span class="summary-value danger">{{ trend.summary.totalRejectedCount }}</span>
-            </div>
-            <div class="summary-item">
-              <span class="summary-label">日均</span>
-              <span class="summary-value">{{ trend.summary.averageDaily }}</span>
-            </div>
-          </div>
-          <v-chart class="chart" :option="trendChartOption" autoresize />
         </div>
+        <div class="trend-summary" v-if="trend.summary && !isFullscreen">
+          <div class="summary-item">
+            <span class="summary-label">总订购</span>
+            <span class="summary-value">{{ trend.summary.totalSubscriptionCount }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">已审批</span>
+            <span class="summary-value success">{{ trend.summary.totalApprovedCount }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">已拒绝</span>
+            <span class="summary-value danger">{{ trend.summary.totalRejectedCount }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">日均</span>
+            <span class="summary-value">{{ trend.summary.averageDaily }}</span>
+          </div>
+        </div>
+        <v-chart class="chart trend-chart" :option="trendChartOption" autoresize />
+      </div>
 
-        <!-- 软件包热度排行 -->
-        <div class="ranking-card stripe-card">
+      <!-- 中间行: 热度排行 + 类型分布 并排 -->
+      <div class="middle-row">
+        <div class="ranking-card content-card">
           <div class="card-header">
             <span class="card-title">软件包热度排行</span>
             <el-radio-group v-if="!isFullscreen" v-model="rankingSortBy" size="small" @change="loadPopularity">
@@ -116,21 +116,21 @@
               <el-radio-button label="business_system_count">按业务系统数</el-radio-button>
             </el-radio-group>
           </div>
-          <el-table :data="popularity.data" size="small" :class="{ 'fullscreen-table': isFullscreen }" :show-header="!isFullscreen">
-            <el-table-column type="index" label="排名" width="60" align="center">
+          <el-table :data="popularity.data" size="small" :class="{ 'fullscreen-table': isFullscreen }" :show-header="!isFullscreen" :resizable="true">
+            <el-table-column type="index" label="#" width="40" align="center" :resizable="false">
               <template #default="{ $index }">
-                <div class="rank-cell" :class="{ 'top-3': $index < 3 }">{{ $index + 1 }}</div>
+                <span class="rank-cell" :class="{ 'top-3': $index < 3 }">{{ $index + 1 }}</span>
               </template>
             </el-table-column>
-            <el-table-column prop="packageName" label="软件包" min-width="150" show-overflow-tooltip />
-            <el-table-column prop="softwareType" label="类型" width="100">
+            <el-table-column prop="packageName" label="软件包" min-width="80" show-overflow-tooltip />
+            <el-table-column prop="softwareType" label="类型" width="65">
               <template #default="{ row }">
                 <el-tag size="small" type="info">{{ formatType(row.softwareType) }}</el-tag>
               </template>
             </el-table-column>
-            <el-table-column prop="subscriptionCount" label="订购数" width="90" align="center" sortable />
-            <el-table-column prop="businessSystemCount" label="关联系统" width="90" align="center" sortable />
-            <el-table-column prop="trend" label="趋势" width="80" align="center">
+            <el-table-column prop="subscriptionCount" label="订购" width="55" align="center" sortable />
+            <el-table-column prop="businessSystemCount" label="系统" width="55" align="center" sortable />
+            <el-table-column prop="trend" label="趋势" width="65" align="center">
               <template #default="{ row }">
                 <el-tag :type="row.trend === 'up' ? 'success' : row.trend === 'down' ? 'danger' : 'info'" size="small">
                   <el-icon>
@@ -144,53 +144,46 @@
             </el-table-column>
           </el-table>
         </div>
-      </div>
 
-      <!-- 右侧面板 -->
-      <div class="charts-right">
-        <!-- 软件类型分布图 -->
-        <div class="chart-card stripe-card">
+        <div class="chart-card type-card">
           <div class="chart-header">
             <span class="chart-title">软件类型分布</span>
           </div>
           <v-chart class="chart pie-chart" :option="typeChartOption" autoresize />
-          <div class="type-legend" v-if="!isFullscreen">
-            <div v-for="item in typeDistribution.data" :key="item.type" class="legend-item">
-              <span class="legend-color" :style="{ background: item.color }"></span>
-              <span class="legend-label">{{ item.typeName }}</span>
-              <span class="legend-value">{{ item.packageCount }}</span>
-            </div>
+        </div>
+      </div>
+
+      <!-- 业务系统分布 -->
+      <div class="distribution-card content-card">
+        <div class="card-header">
+          <span class="card-title">业务系统分布</span>
+          <el-link type="primary" @click="$router.push('/business/systems')" v-if="!isFullscreen">查看全部</el-link>
+        </div>
+        <div class="distribution-summary" v-if="!isFullscreen">
+          <div class="summary-box">
+            <span class="summary-num">{{ businessDistribution.totalBusinessSystems }}</span>
+            <span class="summary-text">活跃系统</span>
+          </div>
+          <div class="summary-box">
+            <span class="summary-num">{{ businessDistribution.totalSubscriptions }}</span>
+            <span class="summary-text">总订购</span>
           </div>
         </div>
-
-        <!-- 业务系统分布 -->
-        <div class="distribution-card stripe-card">
-          <div class="card-header">
-            <span class="card-title">业务系统分布</span>
-            <el-link type="primary" @click="$router.push('/business/systems')" v-if="!isFullscreen">查看全部</el-link>
-          </div>
-          <div class="distribution-summary" v-if="!isFullscreen">
-            <div class="summary-box">
-              <div class="summary-num">{{ businessDistribution.totalBusinessSystems }}</div>
-              <div class="summary-text">活跃系统</div>
-            </div>
-            <div class="summary-box">
-              <div class="summary-num">{{ businessDistribution.totalSubscriptions }}</div>
-              <div class="summary-text">总订购</div>
-            </div>
-          </div>
-          <div class="distribution-list">
-            <div v-for="item in businessDistribution.data?.slice(0, isFullscreen ? 10 : 5)" :key="item.systemId" class="distribution-item">
-              <div class="item-info">
-                <div class="item-name">{{ item.systemName }}</div>
-                <div class="item-code">{{ item.systemCode }}</div>
+        <div class="distribution-list" :class="{ 'distribution-scroll': isFullscreen }">
+          <div class="distribution-scroll-inner" :style="scrollTransform">
+            <template v-for="(item, idx) in displayDistributionItems" :key="isFullscreen ? `${item.systemId}-${idx}` : item.systemId">
+              <div class="distribution-item">
+                <div class="item-info">
+                  <span class="item-name">{{ item.systemName }}</span>
+                  <span class="item-code">{{ item.systemCode }}</span>
+                </div>
+                <div class="item-stats">
+                  <el-tag size="small" type="primary">{{ item.packageCount }}</el-tag>
+                  <el-tag size="small" type="success">{{ item.subscriptionCount }}</el-tag>
+                </div>
+                <el-progress v-if="!isFullscreen" :percentage="item.percentage" :stroke-width="6" :show-text="false" />
               </div>
-              <div class="item-stats">
-                <el-tag size="small" type="primary">{{ item.packageCount }}</el-tag>
-                <el-tag size="small" type="success">{{ item.subscriptionCount }}</el-tag>
-              </div>
-              <el-progress v-if="!isFullscreen" :percentage="item.percentage" :stroke-width="6" :show-text="false" />
-            </div>
+            </template>
           </div>
         </div>
       </div>
@@ -251,14 +244,14 @@ const statsConfig = computed(() => [
     value: overview.totalPackages || 0,
     label: '已发布软件包',
     change: overview.trends?.totalPackagesChange || 0,
-    color: '#635bff'
+    color: '#3B6FF5'
   },
   {
     icon: ShoppingCart,
     value: overview.totalSubscriptions || 0,
     label: '总订购数',
     change: overview.trends?.totalSubscriptionsChange || 0,
-    color: '#24b47e'
+    color: '#16A349'
   },
   {
     icon: OfficeBuilding,
@@ -272,9 +265,53 @@ const statsConfig = computed(() => [
     value: overview.newSubscriptionsThisMonth || 0,
     label: '本月新增订购',
     change: overview.trends?.newSubscriptionsThisMonthChange || 0,
-    color: '#a259ff'
+    color: '#6366F1'
   }
 ])
+
+// 业务系统分布滚动（大屏模式）
+const SCROLL_SPEED = 30 // px per second
+const scrollOffset = ref(0)
+let scrollRafId: number | null = null
+const ITEM_HEIGHT = 72
+
+const displayDistributionItems = computed(() => {
+  const data = businessDistribution.data || []
+  if (data.length === 0) return []
+  if (!isFullscreen.value) return data.slice(0, 5)
+  return [...data, ...data]
+})
+
+const scrollTransform = computed(() => {
+  return isFullscreen.value ? { transform: `translateY(-${scrollOffset.value}px)` } : {}
+})
+
+function startScroll() {
+  if (scrollRafId !== null) return
+  let lastTime = performance.now()
+  function tick(now: number) {
+    const dt = Math.min((now - lastTime) / 1000, 0.1) // cap at 100ms to avoid jumps
+    lastTime = now
+    const count = businessDistribution.data?.length || 0
+    if (count > 0) {
+      const lapHeight = count * ITEM_HEIGHT
+      scrollOffset.value += SCROLL_SPEED * dt
+      if (scrollOffset.value >= lapHeight) {
+        scrollOffset.value -= lapHeight
+      }
+    }
+    scrollRafId = requestAnimationFrame(tick)
+  }
+  scrollRafId = requestAnimationFrame(tick)
+}
+
+function stopScroll() {
+  if (scrollRafId !== null) {
+    cancelAnimationFrame(scrollRafId)
+    scrollRafId = null
+  }
+  scrollOffset.value = 0
+}
 
 // 快捷操作权限
 const canCreatePackage = computed(() => authStore.hasPermission('package:create'))
@@ -291,28 +328,28 @@ const trendChartOption = computed(() => ({
   xAxis: {
     type: 'category',
     data: trendData.data?.map(d => d.date.slice(5)) || [],
-    axisLine: { lineStyle: { color: '#e6ebf1' } },
-    axisLabel: { color: '#525f7f' }
+    axisLine: { lineStyle: { color: '#E2E8F0' } },
+    axisLabel: { color: '#64748B' }
   },
   yAxis: {
     type: 'value',
     minInterval: 1,
-    splitLine: { lineStyle: { color: '#f0f0f0' } },
-    axisLabel: { color: '#525f7f' }
+    splitLine: { lineStyle: { color: '#F1F5F9' } },
+    axisLabel: { color: '#64748B' }
   },
   series: [
     {
       name: '总订购',
       type: 'bar',
       data: trendData.data?.map(d => d.subscriptionCount) || [],
-      itemStyle: { color: '#635bff', borderRadius: [4, 4, 0, 0] }
+      itemStyle: { color: '#3B6FF5', borderRadius: [4, 4, 0, 0] }
     },
     {
       name: '已审批',
       type: 'line',
       data: trendData.data?.map(d => d.approvedCount) || [],
       smooth: true,
-      itemStyle: { color: '#24b47e' },
+      itemStyle: { color: '#16A349' },
       lineStyle: { width: 2 }
     },
     {
@@ -327,19 +364,36 @@ const trendChartOption = computed(() => ({
 }))
 
 // 类型分布图表配置
+const PIE_COLORS = ['#3B6FF5', '#16A349', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4', '#EC4899', '#F97316']
+
 const typeChartOption = computed(() => ({
   tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
+  legend: {
+    orient: 'vertical',
+    right: 10,
+    top: 'center',
+    itemWidth: 10,
+    itemHeight: 10,
+    textStyle: { fontSize: 12, color: '#64748B' }
+  },
   series: [{
     type: 'pie',
-    radius: ['40%', '70%'],
+    radius: ['45%', '75%'],
+    center: ['35%', '50%'],
     avoidLabelOverlap: false,
-    itemStyle: { borderRadius: 8, borderColor: '#fff', borderWidth: 2 },
-    label: { show: false },
-    emphasis: { label: { show: true, fontSize: 14, fontWeight: 'bold' } },
-    data: typeDistribution.data?.map(item => ({
+    itemStyle: { borderRadius: 4, borderColor: '#fff', borderWidth: 2 },
+    label: {
+      show: true,
+      position: 'inside',
+      formatter: '{d}%',
+      fontSize: 12,
+      fontWeight: 'bold',
+      color: '#fff'
+    },
+    data: typeDistribution.data?.map((item, i) => ({
       value: item.packageCount,
       name: item.typeName,
-      itemStyle: { color: item.color }
+      itemStyle: { color: item.color || PIE_COLORS[i % PIE_COLORS.length] }
     })) || []
   }]
 }))
@@ -380,8 +434,10 @@ function toggleFullscreen() {
   isFullscreen.value = !isFullscreen.value
   if (isFullscreen.value) {
     document.body.classList.add('fullscreen-body')
+    startScroll()
   } else {
     document.body.classList.remove('fullscreen-body')
+    stopScroll()
   }
 }
 
@@ -478,6 +534,7 @@ onMounted(async () => {
 
 onUnmounted(() => {
   if (timeInterval) clearInterval(timeInterval)
+  stopScroll()
   document.body.classList.remove('fullscreen-body')
 })
 </script>
@@ -489,8 +546,8 @@ onUnmounted(() => {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--space-xl);
-    padding: var(--space-xl);
+    margin-bottom: var(--space-md);
+    padding: var(--space-lg);
     background: var(--color-bg-card);
     border-radius: var(--radius-xl);
     position: relative;
@@ -501,9 +558,9 @@ onUnmounted(() => {
       position: absolute;
       top: 0;
       left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(135deg, #635bff, #a259ff);
+      bottom: 0;
+      width: 4px;
+      background: var(--color-primary);
     }
 
     &::after {
@@ -513,7 +570,7 @@ onUnmounted(() => {
       right: -10%;
       width: 300px;
       height: 300px;
-      background: radial-gradient(circle, rgba(99, 91, 255, 0.08) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(59, 111, 245, 0.06) 0%, transparent 70%);
       pointer-events: none;
     }
 
@@ -557,60 +614,67 @@ onUnmounted(() => {
   .stats-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: var(--space-lg);
-    margin-bottom: var(--space-xl);
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
   }
 
   .stat-card {
     background: var(--color-bg-card);
-    border-radius: var(--radius-xl);
-    padding: var(--space-xl);
+    border-radius: var(--radius-lg);
+    padding: var(--space-sm) var(--space-lg);
     position: relative;
     overflow: hidden;
     transition: all 0.3s ease;
     border: 1px solid transparent;
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
 
     &:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
       border-color: var(--accent-color);
     }
 
     .stat-bg-gradient {
       position: absolute;
-      top: 0;
-      right: 0;
-      width: 120px;
-      height: 120px;
+      top: -20px;
+      right: -20px;
+      width: 60px;
+      height: 60px;
       background: radial-gradient(circle, rgba(var(--accent-color), 0.1) 0%, transparent 70%);
       opacity: 0.5;
     }
 
     .stat-icon-wrapper {
-      width: 56px;
-      height: 56px;
-      border-radius: var(--radius-lg);
-      background: linear-gradient(135deg, rgba(99, 91, 255, 0.1), rgba(162, 89, 255, 0.1));
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md);
+      background: var(--color-primary-subtle);
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: var(--space-md);
+      flex-shrink: 0;
     }
 
     .stat-info {
-      margin-bottom: var(--space-sm);
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
 
       .stat-value {
-        font-size: 32px;
+        font-size: 20px;
         font-weight: var(--font-weight-bold);
         color: var(--color-text-primary);
-        line-height: 1.1;
+        line-height: 1;
       }
 
       .stat-label {
-        font-size: var(--font-size-sm);
+        font-size: var(--font-size-xs);
         color: var(--color-text-secondary);
-        margin-top: var(--space-xs);
+        white-space: nowrap;
       }
     }
 
@@ -618,19 +682,20 @@ onUnmounted(() => {
       display: inline-flex;
       align-items: center;
       gap: var(--space-xs);
-      font-size: var(--font-size-xs);
+      font-size: 11px;
       font-weight: var(--font-weight-medium);
-      padding: var(--space-xs) var(--space-sm);
+      padding: 2px var(--space-sm);
       border-radius: var(--radius-md);
       background: var(--color-bg-page);
+      flex-shrink: 0;
 
       &.trend-up {
         color: var(--color-success);
-        background: rgba(36, 180, 126, 0.1);
+        background: var(--color-success-light);
       }
       &.trend-down {
         color: var(--color-danger);
-        background: rgba(226, 89, 80, 0.1);
+        background: var(--color-danger-light);
       }
       &.trend-stable {
         color: var(--color-text-secondary);
@@ -640,26 +705,17 @@ onUnmounted(() => {
 
   // Quick Actions
   .quick-actions {
-    margin-bottom: var(--space-xl);
+    margin-bottom: var(--space-md);
 
     .quick-actions-card {
       background: var(--color-bg-card);
+      border: 1px solid var(--color-border);
       border-radius: var(--radius-xl);
-      padding: var(--space-lg);
+      padding: var(--space-md) var(--space-lg);
       position: relative;
 
-      &::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 3px;
-        background: linear-gradient(135deg, #635bff, #a259ff);
-      }
-
       .quick-header {
-        margin-bottom: var(--space-md);
+        margin-bottom: var(--space-sm);
 
         .quick-title {
           font-size: var(--font-size-sm);
@@ -682,40 +738,42 @@ onUnmounted(() => {
 
   // Main Content
   .main-content {
-    display: grid;
-    grid-template-columns: 1.5fr 1fr;
-    gap: var(--space-lg);
-  }
-
-  .charts-left,
-  .charts-right {
     display: flex;
     flex-direction: column;
-    gap: var(--space-lg);
+    gap: var(--space-md);
+  }
+
+  .trend-card {
+    .trend-chart {
+      height: 220px;
+    }
+  }
+
+  .middle-row {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: var(--space-md);
+  }
+
+  .type-card {
+    .pie-chart {
+      height: 200px;
+    }
   }
 
   // Chart Card
   .chart-card {
     background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
     border-radius: var(--radius-xl);
     overflow: hidden;
     position: relative;
-
-    &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(135deg, #635bff, #a259ff);
-    }
 
     .chart-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: var(--space-lg) var(--space-lg) var(--space-md);
+      padding: var(--space-md) var(--space-lg);
 
       .header-left {
         display: flex;
@@ -731,19 +789,14 @@ onUnmounted(() => {
     }
 
     .chart {
-      height: 240px;
+      height: 200px;
       padding: var(--space-md);
-    }
-
-    .pie-chart {
-      height: 180px;
     }
 
     .trend-summary {
       display: flex;
-      gap: var(--space-lg);
-      margin-bottom: var(--space-md);
-      padding: var(--space-md);
+      gap: var(--space-md);
+      padding: var(--space-sm) var(--space-md);
       background: var(--color-bg-page);
       border-radius: var(--radius-md);
 
@@ -768,40 +821,6 @@ onUnmounted(() => {
       }
     }
 
-    .type-legend {
-      margin-top: var(--space-md);
-      padding: 0 var(--space-md) var(--space-md);
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: var(--space-sm);
-
-      .legend-item {
-        display: flex;
-        align-items: center;
-        gap: var(--space-sm);
-        font-size: var(--font-size-xs);
-
-        .legend-color {
-          width: 14px;
-          height: 14px;
-          border-radius: var(--radius-sm);
-          flex-shrink: 0;
-        }
-
-        .legend-label {
-          color: var(--color-text-secondary);
-          flex: 1;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-
-        .legend-value {
-          color: var(--color-text-primary);
-          font-weight: var(--font-weight-semibold);
-        }
-      }
-    }
   }
 
   // Ranking Card
@@ -810,8 +829,7 @@ onUnmounted(() => {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: var(--space-lg) var(--space-lg) var(--space-md);
-      border-bottom: 1px solid var(--color-border-light);
+      padding: var(--space-md) var(--space-lg);
     }
 
     .card-title {
@@ -823,21 +841,13 @@ onUnmounted(() => {
 
   // Rank Cell
   .rank-cell {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: var(--color-bg-page);
-    display: flex;
-    align-items: center;
-    justify-content: center;
     font-size: var(--font-size-xs);
-    font-weight: var(--font-weight-bold);
-    margin: 0 auto;
-    transition: all 0.2s;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-secondary);
 
     &.top-3 {
-      background: linear-gradient(135deg, #635bff, #a259ff);
-      color: white;
+      color: var(--color-primary);
+      font-weight: var(--font-weight-bold);
     }
   }
 
@@ -847,8 +857,7 @@ onUnmounted(() => {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: var(--space-lg) var(--space-lg) var(--space-md);
-      border-bottom: 1px solid var(--color-border-light);
+      padding: var(--space-md) var(--space-lg);
     }
 
     .card-title {
@@ -859,9 +868,8 @@ onUnmounted(() => {
 
     .distribution-summary {
       display: flex;
-      gap: var(--space-lg);
-      margin-bottom: var(--space-lg);
-      padding: var(--space-md);
+      gap: var(--space-md);
+      padding: var(--space-sm) var(--space-md);
       background: var(--color-bg-page);
       border-radius: var(--radius-md);
 
@@ -870,30 +878,44 @@ onUnmounted(() => {
         text-align: center;
 
         .summary-num {
-          font-size: var(--font-size-2xl);
+          font-size: var(--font-size-xl);
           font-weight: var(--font-weight-bold);
-          background: linear-gradient(135deg, #635bff, #a259ff);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
+          color: var(--color-primary);
         }
 
         .summary-text {
           font-size: var(--font-size-xs);
           color: var(--color-text-secondary);
-          margin-top: var(--space-xs);
         }
       }
     }
 
     .distribution-list {
-      padding: var(--space-md);
+      padding: var(--space-sm) var(--space-md);
+
+      &.distribution-scroll {
+        max-height: 340px;
+        overflow: hidden;
+        padding: var(--space-sm);
+
+        .distribution-scroll-inner {
+          will-change: transform;
+        }
+
+        .distribution-item {
+          padding: var(--space-xs) var(--space-md);
+          margin-bottom: 2px;
+        }
+      }
 
       .distribution-item {
-        padding: var(--space-md);
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+        padding: var(--space-sm) var(--space-md);
         background: var(--color-bg-page);
         border-radius: var(--radius-md);
-        margin-bottom: var(--space-sm);
+        margin-bottom: var(--space-xs);
         transition: all 0.2s;
 
         &:hover {
@@ -901,30 +923,35 @@ onUnmounted(() => {
         }
 
         .item-info {
-          margin-bottom: var(--space-sm);
+          flex: 1;
+          min-width: 0;
+          display: flex;
+          align-items: center;
+          gap: var(--space-sm);
 
           .item-name {
             font-weight: var(--font-weight-medium);
             color: var(--color-text-primary);
             font-size: var(--font-size-sm);
+            white-space: nowrap;
           }
 
           .item-code {
             font-size: var(--font-size-xs);
-            color: var(--color-text-secondary);
+            color: var(--color-text-tertiary);
           }
         }
 
         .item-stats {
           display: flex;
           gap: var(--space-xs);
-          margin-bottom: var(--space-sm);
+          flex-shrink: 0;
         }
       }
     }
   }
 
-  // ===== Fullscreen Mode =====
+  // ===== Fullscreen Mode - Dark Data Cockpit =====
   &.fullscreen-mode {
     position: fixed;
     top: 0;
@@ -932,31 +959,30 @@ onUnmounted(() => {
     right: 0;
     bottom: 0;
     z-index: 9999;
-    background: var(--color-bg-page);
-    padding: var(--space-xl);
+    background: #0B1120;
+    padding: var(--space-2xl);
     overflow-y: auto;
 
     .fullscreen-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: var(--space-xl);
-      padding-bottom: var(--space-lg);
+      margin-bottom: var(--space-2xl);
+      padding-bottom: var(--space-xl);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 
       .fullscreen-title {
         h1 {
-          font-size: var(--font-size-3xl);
+          font-size: 32px;
           font-weight: var(--font-weight-bold);
-          background: linear-gradient(135deg, #635bff, #a259ff);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
+          color: #F1F5F9;
           margin: 0 0 var(--space-xs);
+          letter-spacing: -0.5px;
         }
 
         p {
           font-size: var(--font-size-md);
-          color: var(--color-text-secondary);
+          color: #64748B;
           margin: 0;
         }
       }
@@ -964,31 +990,78 @@ onUnmounted(() => {
       .fullscreen-time {
         font-size: var(--font-size-xl);
         font-weight: var(--font-weight-medium);
-        color: var(--color-text-primary);
+        color: #94A3B8;
+        font-family: var(--font-mono);
+      }
+    }
+
+    .stat-card {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(12px);
+      border-radius: var(--radius-xl);
+
+      .stat-value {
+        color: #F1F5F9;
+      }
+      .stat-label {
+        color: #94A3B8;
+      }
+
+      &:hover {
+        border-color: var(--accent-color);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      }
+    }
+
+    .chart-card,
+    .ranking-card,
+    .distribution-card {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(12px);
+      border-radius: var(--radius-xl);
+
+      .chart-title,
+      .card-title {
+        color: #F1F5F9;
       }
     }
 
     .stats-grid.fullscreen-stats {
       grid-template-columns: repeat(4, 1fr);
       gap: var(--space-xl);
-      margin-bottom: var(--space-xl);
+      margin-bottom: var(--space-2xl);
     }
 
     .main-content.fullscreen-charts {
-      grid-template-columns: 1.5fr 1fr;
-
-      .chart {
-        height: 300px;
+      .trend-chart {
+        height: 280px;
       }
+      .chart {
+        height: 280px;
+      }
+    }
+
+    .middle-row {
+      grid-template-columns: 5fr 2fr;
     }
 
     .exit-fullscreen-btn {
       position: fixed;
-      bottom: var(--space-xl);
-      right: var(--space-xl);
+      bottom: var(--space-2xl);
+      right: var(--space-2xl);
       z-index: 10000;
       border-radius: var(--radius-lg);
       padding: var(--space-md) var(--space-xl);
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #F1F5F9;
+      backdrop-filter: blur(8px);
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.15);
+      }
     }
   }
 }

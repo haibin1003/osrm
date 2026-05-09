@@ -7,6 +7,8 @@ import com.osrm.common.exception.BizException;
 import com.osrm.common.model.PageResult;
 import com.osrm.domain.inventory.entity.InventoryRecord;
 import com.osrm.domain.inventory.repository.InventoryRecordRepository;
+import com.osrm.domain.software.entity.SoftwarePackage;
+import com.osrm.domain.software.repository.SoftwarePackageRepository;
 import com.osrm.domain.system.repository.SystemSettingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -28,12 +30,30 @@ public class InventoryAppService {
 
     private final InventoryRecordRepository inventoryRecordRepository;
     private final SystemSettingRepository systemSettingRepository;
+    private final SoftwarePackageRepository softwarePackageRepository;
 
     @Autowired
     public InventoryAppService(InventoryRecordRepository inventoryRecordRepository,
-                               SystemSettingRepository systemSettingRepository) {
+                               SystemSettingRepository systemSettingRepository,
+                               SoftwarePackageRepository softwarePackageRepository) {
         this.inventoryRecordRepository = inventoryRecordRepository;
         this.systemSettingRepository = systemSettingRepository;
+        this.softwarePackageRepository = softwarePackageRepository;
+    }
+
+    /**
+     * 解析软件包名称：优先使用 packageId 反查，回退到请求中的 packageName
+     */
+    private String resolvePackageName(Long packageId, String packageName) {
+        if (packageId != null) {
+            SoftwarePackage pkg = softwarePackageRepository.findById(packageId)
+                    .orElseThrow(() -> new BizException("软件包不存在: id=" + packageId));
+            return pkg.getPackageName();
+        }
+        if (packageName == null || packageName.trim().isEmpty()) {
+            throw new BizException("packageId 和 packageName 至少需要提供一个");
+        }
+        return packageName;
     }
 
     /**
@@ -134,7 +154,7 @@ public class InventoryAppService {
         record.setRecordNo(generateRecordNo());
         record.setUserId(userId);
         record.setPackageId(request.getPackageId());
-        record.setPackageName(request.getPackageName());
+        record.setPackageName(resolvePackageName(request.getPackageId(), request.getPackageName()));
         record.setVersionNo(request.getVersionNo());
         record.setSoftwareType(request.getSoftwareType());
         // 负责人默认是登记人自己
@@ -171,7 +191,7 @@ public class InventoryAppService {
         }
 
         record.setPackageId(request.getPackageId());
-        record.setPackageName(request.getPackageName());
+        record.setPackageName(resolvePackageName(request.getPackageId(), request.getPackageName()));
         record.setVersionNo(request.getVersionNo());
         record.setSoftwareType(request.getSoftwareType());
         if (request.getResponsiblePerson() != null) {

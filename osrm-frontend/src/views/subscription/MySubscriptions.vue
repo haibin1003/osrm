@@ -8,7 +8,7 @@
       <el-button type="primary" @click="openApplyDialog"><el-icon><Plus /></el-icon>申请订购</el-button>
     </div>
 
-    <div class="table-card stripe-card">
+    <div class="table-card content-card">
       <el-table v-loading="loading" :data="tableData">
         <el-table-column prop="packageName" label="软件包" min-width="150" />
         <el-table-column prop="versionNumber" label="版本" width="100" />
@@ -262,7 +262,7 @@ onMounted(async () => {
       left: 0;
       right: 0;
       height: 3px;
-      background: linear-gradient(135deg, #635bff, #a259ff);
+      background: var(--color-primary);
     }
   }
 

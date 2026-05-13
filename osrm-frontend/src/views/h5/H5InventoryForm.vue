@@ -8,7 +8,14 @@
           <el-input v-model="form.responsiblePerson" placeholder="请输入姓名" />
         </el-form-item>
         <el-form-item label="手机号" prop="phone">
-          <el-input v-model="form.phone" placeholder="请输入11位手机号" maxlength="11" />
+          <el-input
+            v-model="form.phone"
+            placeholder="选择系统应用后自动带出"
+            maxlength="11"
+            @focus="onPhoneFocus"
+            @blur="onPhoneBlur"
+          />
+          <div v-if="phoneOriginal" class="phone-hint">已脱敏显示：{{ maskedPhone }}</div>
         </el-form-item>
         <el-form-item label="部门">
           <el-input v-model="form.department" placeholder="请输入部门（选填）" />
@@ -46,8 +53,13 @@
           </div>
         </el-form-item>
 
-        <el-form-item v-if="showApplicationSelect" label="所属应用">
-          <el-select v-model="form.applicationCatalogId" placeholder="请选择应用（选填）" clearable style="width: 100%">
+        <el-form-item v-if="showApplicationSelect" label="所属应用" prop="applicationCatalogId">
+          <el-select
+            v-model="form.applicationCatalogId"
+            placeholder="请选择应用"
+            style="width: 100%"
+            @change="onApplicationChange"
+          >
             <el-option
               v-for="app in applicationList"
               :key="app.id"
@@ -153,7 +165,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
@@ -203,20 +215,39 @@ const systemSelected = ref(false)
 const selectedSystemName = ref('')
 const showApplicationSelect = ref(false)
 const applicationList = ref<ApplicationCatalogItem[]>([])
+const phoneOriginal = ref('')
+const phoneFocused = ref(false)
 const captchaImage = ref('')
 const submitting = ref(false)
+
+const maskedPhone = computed(() => {
+  const p = phoneOriginal.value || form.phone
+  if (!p || p.length < 7) return p
+  return p.substring(0, 2) + '***' + p.substring(p.length - 2)
+})
 
 const rules: FormRules = {
   responsiblePerson: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
   phone: [
     { required: true, message: '请输入手机号', trigger: 'blur' },
-    { pattern: /^1[3-9]\d{9}$/, message: '手机号格式不正确', trigger: 'blur' }
+    {
+      validator: (_rule, _value, callback) => {
+        const actual = phoneOriginal.value || form.phone
+        if (!actual || !/^1[3-9]\d{9}$/.test(actual)) {
+          callback(new Error('手机号格式不正确'))
+        } else {
+          callback()
+        }
+      },
+      trigger: 'blur'
+    }
   ],
   email: [
     { required: true, message: '请输入邮箱', trigger: 'blur' },
     { type: 'email', message: '邮箱格式不正确', trigger: 'blur' }
   ],
   systemCatalogId: [{ required: true, message: '请选择系统', trigger: 'change' }],
+  applicationCatalogId: [{ required: true, message: '请选择应用', trigger: 'change' }],
   captchaCode: [{ required: true, message: '请输入验证码', trigger: 'blur' }]
 }
 
@@ -246,21 +277,50 @@ function selectSystem(sys: SystemCatalogItem) {
 
   showApplicationSelect.value = true
   form.applicationCatalogId = null
+  applicationList.value = []
   getApplications(sys.id).then((res: any) => {
     applicationList.value = res || []
   })
+}
 
-  getSuggestion(sys.id).then((res: any) => {
-    if (res && !form.responsiblePerson && res.responsiblePerson) {
-      form.responsiblePerson = res.responsiblePerson
+function onApplicationChange(appId: number | null) {
+  if (!appId) {
+    form.responsiblePerson = ''
+    form.phone = ''
+    phoneOriginal.value = ''
+    form.department = ''
+    return
+  }
+  const app = applicationList.value.find(a => a.id === appId)
+  if (app) {
+    if (app.responsiblePerson) form.responsiblePerson = app.responsiblePerson
+    if (app.responsiblePhone) {
+      phoneOriginal.value = app.responsiblePhone
+      form.phone = maskedPhone.value
     }
-    if (res && !form.phone && res.responsiblePhone) {
-      form.phone = res.responsiblePhone
-    }
-    if (res && !form.department && res.responsibleDept) {
-      form.department = res.responsibleDept
-    }
-  })
+  }
+  // 系统级部门建议兜底
+  if (form.systemCatalogId) {
+    getSuggestion(form.systemCatalogId).then((res: any) => {
+      if (res && !form.department && res.responsibleDept) {
+        form.department = res.responsibleDept
+      }
+    })
+  }
+}
+
+function onPhoneFocus() {
+  if (phoneOriginal.value) {
+    form.phone = phoneOriginal.value
+  }
+}
+
+function onPhoneBlur() {
+  const full = form.phone
+  if (full && /^1[3-9]\d{9}$/.test(full)) {
+    phoneOriginal.value = full
+    form.phone = maskedPhone.value
+  }
 }
 
 function clearSystem() {
@@ -270,6 +330,8 @@ function clearSystem() {
   selectedSystemName.value = ''
   showApplicationSelect.value = false
   applicationList.value = []
+  phoneOriginal.value = ''
+  phoneFocused.value = false
 }
 
 function addEntry() {
@@ -300,11 +362,11 @@ function onSubmit() {
     submitting.value = true
     submitInventory({
       responsiblePerson: form.responsiblePerson,
-      phone: form.phone,
+      phone: phoneOriginal.value || form.phone,
       department: form.department || undefined,
       email: form.email || undefined,
       systemCatalogId: form.systemCatalogId!,
-      applicationCatalogId: form.applicationCatalogId || undefined,
+      applicationCatalogId: form.applicationCatalogId!,
       softwareEntries: form.softwareEntries.map(e => ({
         packageName: e.packageName,
         versionNo: e.versionNo || undefined,

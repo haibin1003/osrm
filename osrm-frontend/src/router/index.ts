@@ -35,6 +35,31 @@ const routes: RouteRecordRaw[] = [
     ]
   },
   {
+    path: '/h5',
+    component: () => import('@/layouts/H5Layout.vue'),
+    meta: { public: true },
+    children: [
+      {
+        path: 'inventory',
+        name: 'H5Inventory',
+        component: () => import('@/views/h5/H5InventoryForm.vue'),
+        meta: { public: true }
+      },
+      {
+        path: 'inventory/success',
+        name: 'H5SubmitSuccess',
+        component: () => import('@/views/h5/H5SubmitSuccess.vue'),
+        meta: { public: true }
+      },
+      {
+        path: 'expired',
+        name: 'H5LinkExpired',
+        component: () => import('@/views/h5/H5LinkExpired.vue'),
+        meta: { public: true }
+      }
+    ]
+  },
+  {
     path: '/',
     name: 'Layout',
     component: () => import('@/layouts/MainLayout.vue'),
@@ -48,6 +73,12 @@ const routes: RouteRecordRaw[] = [
         name: 'Home',
         component: () => import('@/views/home/Index.vue'),
         meta: { title: '首页' }
+      },
+      {
+        path: 'fullscreen-graph',
+        name: 'FullscreenGraph',
+        component: () => import('@/views/home/FullscreenGraph.vue'),
+        meta: { title: '关联图全屏', permissions: ['business-system:read'] }
       },
       // 软件管理
       {
@@ -92,6 +123,19 @@ const routes: RouteRecordRaw[] = [
         name: 'ApprovalHistory',
         component: () => import('@/views/subscription/ApprovalHistory.vue'),
         meta: { title: '审批历史' }
+      },
+      // 系统目录
+      {
+        path: 'catalog/systems',
+        name: 'SystemCatalog',
+        component: () => import('@/views/catalog/SystemCatalogList.vue'),
+        meta: { title: '系统目录', permissions: ['business-system:read'] }
+      },
+      {
+        path: 'catalog/systems/:id',
+        name: 'SystemCatalogDetail',
+        component: () => import('@/views/catalog/SystemCatalogDetail.vue'),
+        meta: { title: '业务系统详情', permissions: ['business-system:read'] }
       },
       // 存量登记
       {
@@ -205,6 +249,12 @@ const routes: RouteRecordRaw[] = [
         name: 'Stats',
         component: () => import('@/views/stats/Index.vue'),
         meta: { title: '使用统计' }
+      },
+      {
+        path: 'system/h5-links',
+        name: 'H5LinkManagement',
+        component: () => import('@/views/system/H5LinkManagement.vue'),
+        meta: { title: 'H5链接管理', permissions: ['system:manage'] }
       },
       {
         path: 'tracking/relationship-graph',

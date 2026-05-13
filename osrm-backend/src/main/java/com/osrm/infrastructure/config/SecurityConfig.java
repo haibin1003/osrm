@@ -52,6 +52,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/portal/**").permitAll()
                 .requestMatchers("/api/v1/statistics/**").permitAll()
                 .requestMatchers("/api/v1/inventory/settings").permitAll()
+                .requestMatchers("/api/v1/h5/**").permitAll()
                 .requestMatchers("/actuator/health").permitAll()
                 .requestMatchers("/api/v1/auth/**").authenticated()
                 .anyRequest().authenticated())

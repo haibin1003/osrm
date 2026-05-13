@@ -177,6 +177,9 @@ const menus = [
   {
     title: '系统管理', path: '/system', icon: 'Tools',
     children: [
+      { title: '资产目录', items: [
+        { title: '系统目录', path: '/catalog/systems', permission: 'business-system:read' }
+      ]},
       { title: '用户权限', items: [
         { title: '用户管理', path: '/system/users', permission: 'user:read' },
         { title: '角色管理', path: '/system/roles', permission: 'role:read' },
@@ -184,6 +187,7 @@ const menus = [
       ]},
       { title: '基础配置', items: [
         { title: '存储配置', path: '/system/storage', permission: 'storage:read' },
+        { title: 'H5链接管理', path: '/system/h5-links', permission: 'system:manage' },
         { title: '系统设置', path: '/system/settings', permission: 'system:manage' },
         { title: '使用统计', path: '/stats', permission: 'system:manage' }
       ]}

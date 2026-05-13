@@ -1,0 +1,26 @@
+# Docker 部署专用配置
+# 通过 docker-compose 的 SPRING_CONFIG_ADDITIONAL_LOCATION 加载
+
+server:
+  port: 8080
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: none   # Flyway 管理所有 DDL，不依赖 Hibernate
+
+  flyway:
+    enabled: true
+    locations: filesystem:../osrm-deploy/sql/flyway/baseline,filesystem:../osrm-deploy/sql/flyway/migration
+    baseline-on-migrate: true
+    validate-on-migrate: false
+    clean-disabled: true
+
+  data:
+    redis:
+      port: 6379
+
+logging:
+  level:
+    root: WARN
+    com.osrm: INFO

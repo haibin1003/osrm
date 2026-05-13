@@ -2,6 +2,9 @@
 *
 !/.gitignore
 !/README.md
+!/DEPLOY.md
+!/docker/
+!/docker/**
 !/osrm-backend/
 !/osrm-backend/**
 !/osrm-frontend/

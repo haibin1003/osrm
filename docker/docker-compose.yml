@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+  osrm-backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backend
+    container_name: osrm-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=none
+      - SPRING_DATA_REDIS_PORT=6379
+      - JWT_SECRET=${JWT_SECRET:-osrm-prod-jwt-secret-change-me-min-256-bits}
+      - MYSQL_USERNAME=${MYSQL_USERNAME:-root}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-root123}
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-redis123}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O-", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  osrm-frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.frontend
+    container_name: osrm-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      osrm-backend:
+        condition: service_started
+    restart: unless-stopped

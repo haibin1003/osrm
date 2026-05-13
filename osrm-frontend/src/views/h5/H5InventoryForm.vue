@@ -8,32 +8,21 @@
           请先选择所属系统和应用，系统将自动关联责任人信息
         </div>
         <el-form-item label="所属系统" prop="systemCatalogId">
-          <el-input
-            v-model="systemKeyword"
-            placeholder="输入系统名称搜索"
+          <el-select
+            v-model="form.systemCatalogId"
+            placeholder="请选择系统（可输入搜索）"
+            style="width: 100%"
+            filterable
             clearable
-            @input="onSystemSearch"
-          />
-          <div v-if="!systemSelected && systemList.length > 0" class="system-list">
-            <div class="system-list-hint">请选择一个系统</div>
-            <div
-              v-for="sys in systemList"
+            @change="onSystemChange"
+          >
+            <el-option
+              v-for="sys in allSystems"
               :key="sys.id"
-              class="system-item"
-              :class="{ active: form.systemCatalogId === sys.id }"
-              @click="selectSystem(sys)"
-            >
-              <span class="system-radio"></span>
-              <div>
-                <div class="system-name">{{ sys.systemName }}</div>
-                <div class="system-code">{{ sys.systemCode }}</div>
-              </div>
-            </div>
-          </div>
-          <div v-if="systemSelected" class="selected-tag">
-            <span>{{ selectedSystemName }}</span>
-            <el-button link type="primary" size="small" @click="clearSystem">更换</el-button>
-          </div>
+              :label="`${sys.systemName} (${sys.systemCode})`"
+              :value="sys.id"
+            />
+          </el-select>
         </el-form-item>
 
         <el-form-item v-if="showApplicationSelect" label="所属应用" prop="applicationCatalogId">
@@ -179,7 +168,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
@@ -223,14 +212,10 @@ const form = reactive({
   captchaCode: ''
 })
 
-const systemKeyword = ref('')
-const systemList = ref<SystemCatalogItem[]>([])
-const systemSelected = ref(false)
-const selectedSystemName = ref('')
+const allSystems = ref<SystemCatalogItem[]>([])
 const showApplicationSelect = ref(false)
 const applicationList = ref<ApplicationCatalogItem[]>([])
 const phoneOriginal = ref('')
-const phoneFocused = ref(false)
 const captchaImage = ref('')
 const submitting = ref(false)
 
@@ -265,34 +250,26 @@ const rules: FormRules = {
   captchaCode: [{ required: true, message: '请输入验证码', trigger: 'blur' }]
 }
 
-let systemSearchTimer: ReturnType<typeof setTimeout> | null = null
-function onSystemSearch() {
-  if (systemSelected.value) return
-  if (systemSearchTimer) clearTimeout(systemSearchTimer)
-  systemSearchTimer = setTimeout(() => {
-    if (!systemKeyword.value.trim()) {
-      systemList.value = []
-      return
-    }
-    searchSystems(systemKeyword.value.trim(), 1, 20).then((res: any) => {
-      systemList.value = res.content || []
-    }).catch(() => {
-      systemList.value = []
-    })
-  }, 300)
-}
-
-function selectSystem(sys: SystemCatalogItem) {
-  form.systemCatalogId = sys.id
-  selectedSystemName.value = sys.systemName
-  systemSelected.value = true
-  systemList.value = []
-  systemKeyword.value = ''
+function onSystemChange(sysId: number | null) {
+  if (!sysId) {
+    showApplicationSelect.value = false
+    applicationList.value = []
+    form.applicationCatalogId = null
+    form.responsiblePerson = ''
+    form.phone = ''
+    form.department = ''
+    phoneOriginal.value = ''
+    return
+  }
 
   showApplicationSelect.value = true
   form.applicationCatalogId = null
+  form.responsiblePerson = ''
+  form.phone = ''
+  form.department = ''
+  phoneOriginal.value = ''
   applicationList.value = []
-  getApplications(sys.id).then((res: any) => {
+  getApplications(sysId).then((res: any) => {
     applicationList.value = res || []
   })
 }
@@ -335,17 +312,6 @@ function onPhoneBlur() {
     phoneOriginal.value = full
     form.phone = maskedPhone.value
   }
-}
-
-function clearSystem() {
-  form.systemCatalogId = null
-  form.applicationCatalogId = null
-  systemSelected.value = false
-  selectedSystemName.value = ''
-  showApplicationSelect.value = false
-  applicationList.value = []
-  phoneOriginal.value = ''
-  phoneFocused.value = false
 }
 
 function addEntry() {
@@ -410,6 +376,12 @@ function onSubmit() {
   })
 }
 
+onMounted(() => {
+  searchSystems('', 1, 200).then((res: any) => {
+    allSystems.value = res.content || []
+  })
+})
+
 refreshCaptcha()
 </script>
 
@@ -439,80 +411,6 @@ refreshCaptcha()
   color: #909399;
   margin-bottom: 12px;
   padding-left: 11px;
-}
-
-.system-list-hint {
-  font-size: 12px;
-  color: #909399;
-  padding: 8px 12px 4px;
-}
-
-.system-list {
-  margin-top: 8px;
-  max-height: 240px;
-  overflow-y: auto;
-  border: 1px solid #e4e7ed;
-  border-radius: 8px;
-  background: #fff;
-}
-
-.system-item {
-  padding: 10px 12px;
-  border-bottom: 1px solid #f0f0f0;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  &:last-child { border-bottom: none; }
-  &.active, &:active { background: #f5f7fa; }
-}
-
-.system-radio {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  border: 2px solid #dcdfe6;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  .system-item.active & {
-    border-color: #409eff;
-    &::after {
-      content: '';
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #409eff;
-    }
-  }
-}
-
-.system-name {
-  font-size: 14px;
-  color: #303133;
-  font-weight: 500;
-}
-
-.system-code {
-  font-size: 12px;
-  color: #909399;
-  margin-top: 2px;
-}
-
-.selected-tag {
-  margin-top: 8px;
-  padding: 8px 12px;
-  background: #f0f9ff;
-  border: 1px solid #d9ecff;
-  border-radius: 8px;
-  font-size: 14px;
-  color: #409eff;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
 }
 
 .software-card {

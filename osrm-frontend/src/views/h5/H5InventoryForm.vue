@@ -1,33 +1,12 @@
 <template>
   <div class="h5-form">
     <el-form ref="formRef" :model="form" :rules="rules" label-position="top" size="large">
-      <!-- 责任人信息 -->
-      <div class="section">
-        <div class="section-title">责任人信息</div>
-        <el-form-item label="姓名" prop="responsiblePerson">
-          <el-input v-model="form.responsiblePerson" placeholder="请输入姓名" />
-        </el-form-item>
-        <el-form-item label="手机号" prop="phone">
-          <el-input
-            v-model="form.phone"
-            placeholder="选择系统应用后自动带出"
-            maxlength="11"
-            @focus="onPhoneFocus"
-            @blur="onPhoneBlur"
-          />
-          <div v-if="phoneOriginal" class="phone-hint">已脱敏显示：{{ maskedPhone }}</div>
-        </el-form-item>
-        <el-form-item label="部门">
-          <el-input v-model="form.department" placeholder="请输入部门（选填）" />
-        </el-form-item>
-        <el-form-item label="邮箱" prop="email">
-          <el-input v-model="form.email" placeholder="请输入邮箱" />
-        </el-form-item>
-      </div>
-
-      <!-- 系统选择 -->
+      <!-- 系统信息（先选系统和应用，带出责任人信息） -->
       <div class="section">
         <div class="section-title">系统信息</div>
+        <div class="section-tip">
+          请先选择所属系统和应用，系统将自动关联责任人信息
+        </div>
         <el-form-item label="所属系统" prop="systemCatalogId">
           <el-input
             v-model="systemKeyword"
@@ -35,7 +14,8 @@
             clearable
             @input="onSystemSearch"
           />
-          <div v-if="systemList.length > 0" class="system-list">
+          <div v-if="!systemSelected && systemList.length > 0" class="system-list">
+            <div class="system-list-hint">请选择一个系统</div>
             <div
               v-for="sys in systemList"
               :key="sys.id"
@@ -43,12 +23,15 @@
               :class="{ active: form.systemCatalogId === sys.id }"
               @click="selectSystem(sys)"
             >
-              <div class="system-name">{{ sys.systemName }}</div>
-              <div class="system-code">{{ sys.systemCode }}</div>
+              <span class="system-radio"></span>
+              <div>
+                <div class="system-name">{{ sys.systemName }}</div>
+                <div class="system-code">{{ sys.systemCode }}</div>
+              </div>
             </div>
           </div>
           <div v-if="systemSelected" class="selected-tag">
-            已选系统：{{ selectedSystemName }}
+            <span>{{ selectedSystemName }}</span>
             <el-button link type="primary" size="small" @click="clearSystem">更换</el-button>
           </div>
         </el-form-item>
@@ -70,9 +53,40 @@
         </el-form-item>
       </div>
 
+      <!-- 责任人信息（系统选择后自动带出，可手动修改） -->
+      <div class="section">
+        <div class="section-title">责任人信息</div>
+        <div class="section-tip">
+          以下信息由所选应用自动带出，也可手动修改
+        </div>
+        <el-form-item label="姓名" prop="responsiblePerson">
+          <el-input v-model="form.responsiblePerson" placeholder="请输入姓名" />
+        </el-form-item>
+        <el-form-item label="手机号" prop="phone">
+          <el-input
+            v-model="form.phone"
+            placeholder="请输入11位手机号"
+            maxlength="11"
+            @focus="onPhoneFocus"
+            @blur="onPhoneBlur"
+          />
+          <div v-if="phoneOriginal" class="phone-hint">已脱敏显示：{{ maskedPhone }}</div>
+        </el-form-item>
+        <el-form-item label="部门">
+          <el-input v-model="form.department" placeholder="请输入部门（选填）" />
+        </el-form-item>
+        <el-form-item label="邮箱" prop="email">
+          <el-input v-model="form.email" placeholder="请输入邮箱" />
+          <div class="email-tip">为方便开通开源软件管理平台的账号，请输入邮箱信息</div>
+        </el-form-item>
+      </div>
+
       <!-- 软件列表 -->
       <div class="section">
-        <div class="section-title">软件列表</div>
+        <div class="section-title">软件信息</div>
+        <div class="section-tip">
+          填写当前系统下正在使用的开源软件，可添加多个
+        </div>
         <div
           v-for="(entry, index) in form.softwareEntries"
           :key="index"
@@ -415,9 +429,22 @@ refreshCaptcha()
   font-size: 15px;
   font-weight: 600;
   color: #303133;
-  margin-bottom: 12px;
+  margin-bottom: 4px;
   padding-left: 8px;
   border-left: 3px solid #409eff;
+}
+
+.section-tip {
+  font-size: 12px;
+  color: #909399;
+  margin-bottom: 12px;
+  padding-left: 11px;
+}
+
+.system-list-hint {
+  font-size: 12px;
+  color: #909399;
+  padding: 8px 12px 4px;
 }
 
 .system-list {
@@ -433,9 +460,34 @@ refreshCaptcha()
   padding: 10px 12px;
   border-bottom: 1px solid #f0f0f0;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 
   &:last-child { border-bottom: none; }
   &.active, &:active { background: #f5f7fa; }
+}
+
+.system-radio {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid #dcdfe6;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .system-item.active & {
+    border-color: #409eff;
+    &::after {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #409eff;
+    }
+  }
 }
 
 .system-name {
@@ -497,6 +549,19 @@ refreshCaptcha()
   :deep(.el-form-item__label) {
     font-size: 12px;
   }
+}
+
+.phone-hint {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #909399;
+}
+
+.email-tip {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #909399;
+  line-height: 1.5;
 }
 
 .captcha-row {

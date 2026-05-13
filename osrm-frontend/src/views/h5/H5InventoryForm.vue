@@ -54,9 +54,8 @@
         <el-form-item label="手机号" prop="phone">
           <el-input
             v-model="form.phone"
-            placeholder="请输入11位手机号"
+            placeholder="选择系统应用后自动带出"
             maxlength="11"
-            @focus="onPhoneFocus"
             @blur="onPhoneBlur"
           />
           <div v-if="phoneOriginal" class="phone-hint">已脱敏显示：{{ maskedPhone }}</div>
@@ -297,12 +296,6 @@ function onApplicationChange(appId: number | null) {
         form.department = res.responsibleDept
       }
     })
-  }
-}
-
-function onPhoneFocus() {
-  if (phoneOriginal.value) {
-    form.phone = phoneOriginal.value
   }
 }
 

@@ -1,10 +1,16 @@
 package com.osrm.application.inventory.service;
 
+import com.osrm.application.inventory.dto.request.BatchCreateInventoryRequest;
 import com.osrm.application.inventory.dto.request.CreateInventoryRequest;
 import com.osrm.application.inventory.dto.request.RejectInventoryRequest;
 import com.osrm.application.inventory.dto.response.InventoryDTO;
 import com.osrm.common.exception.BizException;
 import com.osrm.common.model.PageResult;
+import com.osrm.common.util.HtmlSanitizer;
+import com.osrm.domain.business.entity.BusinessSystem;
+import com.osrm.domain.business.entity.BusinessSystemApplication;
+import com.osrm.domain.business.repository.BusinessSystemApplicationRepository;
+import com.osrm.domain.business.repository.BusinessSystemRepository;
 import com.osrm.domain.inventory.entity.InventoryRecord;
 import com.osrm.domain.inventory.repository.InventoryRecordRepository;
 import com.osrm.domain.software.entity.SoftwarePackage;
@@ -31,14 +37,20 @@ public class InventoryAppService {
     private final InventoryRecordRepository inventoryRecordRepository;
     private final SystemSettingRepository systemSettingRepository;
     private final SoftwarePackageRepository softwarePackageRepository;
+    private final BusinessSystemRepository businessSystemRepository;
+    private final BusinessSystemApplicationRepository businessSystemApplicationRepository;
 
     @Autowired
     public InventoryAppService(InventoryRecordRepository inventoryRecordRepository,
                                SystemSettingRepository systemSettingRepository,
-                               SoftwarePackageRepository softwarePackageRepository) {
+                               SoftwarePackageRepository softwarePackageRepository,
+                               BusinessSystemRepository businessSystemRepository,
+                               BusinessSystemApplicationRepository businessSystemApplicationRepository) {
         this.inventoryRecordRepository = inventoryRecordRepository;
         this.systemSettingRepository = systemSettingRepository;
         this.softwarePackageRepository = softwarePackageRepository;
+        this.businessSystemRepository = businessSystemRepository;
+        this.businessSystemApplicationRepository = businessSystemApplicationRepository;
     }
 
     /**
@@ -53,7 +65,33 @@ public class InventoryAppService {
         if (packageName == null || packageName.trim().isEmpty()) {
             throw new BizException("packageId 和 packageName 至少需要提供一个");
         }
-        return packageName;
+        return HtmlSanitizer.sanitizeText(packageName);
+    }
+
+    /**
+     * 校验两级目录关系：若提供了 applicationCatalogId，则它必须属于 systemCatalogId 且两者均存在/启用。
+     */
+    private void validateCatalogRelation(Long businessSystemId, Long businessSystemApplicationId) {
+        if (businessSystemId == null && businessSystemApplicationId == null) {
+            return;
+        }
+        if (businessSystemId != null) {
+            BusinessSystem system = businessSystemRepository.findById(businessSystemId)
+                    .orElseThrow(() -> new BizException("所选业务系统不存在"));
+            if (!Boolean.TRUE.equals(system.getEnabled())) {
+                throw new BizException("所选系统已停用");
+            }
+            if (businessSystemApplicationId != null) {
+                BusinessSystemApplication app = businessSystemApplicationRepository.findById(businessSystemApplicationId)
+                        .orElseThrow(() -> new BizException("所选应用不存在"));
+                if (!app.getBusinessSystemId().equals(system.getId())) {
+                    throw new BizException("所选应用不属于该系统");
+                }
+                if (!Boolean.TRUE.equals(app.getEnabled())) {
+                    throw new BizException("所选应用已停用");
+                }
+            }
+        }
     }
 
     /**
@@ -150,6 +188,8 @@ public class InventoryAppService {
             throw new BizException("存量登记功能已关闭");
         }
 
+        validateCatalogRelation(request.getBusinessSystemId(), request.getBusinessSystemApplicationId());
+
         InventoryRecord record = new InventoryRecord();
         record.setRecordNo(generateRecordNo());
         record.setUserId(userId);
@@ -157,19 +197,56 @@ public class InventoryAppService {
         record.setPackageName(resolvePackageName(request.getPackageId(), request.getPackageName()));
         record.setVersionNo(request.getVersionNo());
         record.setSoftwareType(request.getSoftwareType());
-        // 负责人默认是登记人自己
         record.setResponsiblePerson(request.getResponsiblePerson() != null ?
                 request.getResponsiblePerson() : userName);
         record.setBusinessSystemId(request.getBusinessSystemId());
+        record.setBusinessSystemApplicationId(request.getBusinessSystemApplicationId());
         record.setDeployEnvironment(request.getDeployEnvironment());
         record.setServerCount(request.getServerCount() != null ? request.getServerCount() : 1);
-        record.setUsageScenario(request.getUsageScenario());
-        record.setRemarks(request.getRemarks());
+        record.setUsageScenario(HtmlSanitizer.sanitizeText(request.getUsageScenario()));
+        record.setRemarks(HtmlSanitizer.sanitizeText(request.getRemarks()));
         record.setSourceType(InventoryRecord.SourceType.MANUAL);
+        record.setSubmitSource(InventoryRecord.SubmitSource.INTERNAL);
         record.setStatus(InventoryRecord.InventoryStatus.PENDING);
 
         InventoryRecord saved = inventoryRecordRepository.save(record);
         return InventoryDTO.from(saved);
+    }
+
+    /**
+     * 批量创建存量登记 — 一个系统一次提交多个软件
+     */
+    @Transactional
+    public List<InventoryDTO> batchCreateInventory(BatchCreateInventoryRequest request, Long userId, String userName) {
+        if (!isInventoryFeatureEnabled()) {
+            throw new BizException("存量登记功能已关闭");
+        }
+
+        validateCatalogRelation(request.getBusinessSystemId(), request.getBusinessSystemApplicationId());
+
+        List<InventoryRecord> records = request.getSoftwareEntries().stream().map(entry -> {
+            InventoryRecord record = new InventoryRecord();
+            record.setRecordNo(generateRecordNo());
+            record.setUserId(userId);
+            record.setPackageId(entry.getPackageId());
+            record.setPackageName(resolvePackageName(entry.getPackageId(), entry.getPackageName()));
+            record.setVersionNo(entry.getVersionNo());
+            record.setSoftwareType(entry.getSoftwareType());
+            record.setResponsiblePerson(userName);
+            record.setBusinessSystemId(request.getBusinessSystemId());
+            record.setBusinessSystemApplicationId(request.getBusinessSystemApplicationId());
+            record.setDeployEnvironment(entry.getDeployEnvironment());
+            record.setServerCount(entry.getServerCount() != null ? entry.getServerCount() : 1);
+            record.setUsageScenario(HtmlSanitizer.sanitizeText(entry.getUsageScenario()));
+            record.setRemarks(HtmlSanitizer.sanitizeText(entry.getRemarks()));
+            record.setSourceType(InventoryRecord.SourceType.MANUAL);
+            record.setSubmitSource(InventoryRecord.SubmitSource.INTERNAL);
+            record.setStatus(InventoryRecord.InventoryStatus.PENDING);
+            return record;
+        }).collect(Collectors.toList());
+
+        List<InventoryRecord> saved = inventoryRecordRepository.saveAll(records);
+        return saved.stream().map(InventoryDTO::from).collect(Collectors.toList());
     }
 
     /**
@@ -190,6 +267,8 @@ public class InventoryAppService {
             throw new BizException("只有待审批状态的记录可以修改");
         }
 
+        validateCatalogRelation(request.getBusinessSystemId(), request.getBusinessSystemApplicationId());
+
         record.setPackageId(request.getPackageId());
         record.setPackageName(resolvePackageName(request.getPackageId(), request.getPackageName()));
         record.setVersionNo(request.getVersionNo());
@@ -198,10 +277,11 @@ public class InventoryAppService {
             record.setResponsiblePerson(request.getResponsiblePerson());
         }
         record.setBusinessSystemId(request.getBusinessSystemId());
+        record.setBusinessSystemApplicationId(request.getBusinessSystemApplicationId());
         record.setDeployEnvironment(request.getDeployEnvironment());
         record.setServerCount(request.getServerCount());
-        record.setUsageScenario(request.getUsageScenario());
-        record.setRemarks(request.getRemarks());
+        record.setUsageScenario(HtmlSanitizer.sanitizeText(request.getUsageScenario()));
+        record.setRemarks(HtmlSanitizer.sanitizeText(request.getRemarks()));
 
         InventoryRecord saved = inventoryRecordRepository.save(record);
         return InventoryDTO.from(saved);

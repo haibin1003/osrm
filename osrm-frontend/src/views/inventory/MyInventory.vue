@@ -30,7 +30,20 @@
           <el-table-column prop="recordNo" label="登记编号" width="160" />
           <el-table-column prop="packageName" label="软件名称" />
           <el-table-column prop="versionNo" label="版本号" width="100" />
-          <el-table-column prop="businessSystemName" label="业务系统" width="120" />
+          <el-table-column label="系统/应用" min-width="160">
+            <template #default="{ row }">
+              <div>{{ row.businessSystemName || '-' }}</div>
+              <div v-if="row.businessSystemApplicationName" style="font-size: 12px; color: #909399">
+                {{ row.businessSystemApplicationName }}
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column prop="submitSource" label="来源" width="80">
+            <template #default="{ row }">
+              <el-tag v-if="row.submitSource === 'H5'" size="small" type="warning">H5</el-tag>
+              <el-tag v-else size="small" type="info">内部</el-tag>
+            </template>
+          </el-table-column>
           <el-table-column prop="deployEnvironment" label="环境" width="80">
             <template #default="{ row }">
               <el-tag v-if="row.deployEnvironment === 'PRODUCTION'" type="danger">生产</el-tag>
@@ -83,6 +96,8 @@
         <el-descriptions-item label="版本号">{{ currentRow.versionNo || '-' }}</el-descriptions-item>
         <el-descriptions-item label="软件类型">{{ currentRow.softwareType || '-' }}</el-descriptions-item>
         <el-descriptions-item label="业务系统">{{ currentRow.businessSystemName || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="应用">{{ currentRow.businessSystemApplicationName || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="提交来源">{{ currentRow.submitSource === 'H5' ? 'H5公开链接' : '内部页' }}</el-descriptions-item>
         <el-descriptions-item label="部署环境">{{ currentRow.deployEnvironment || '-' }}</el-descriptions-item>
         <el-descriptions-item label="服务器数量">{{ currentRow.serverCount }}</el-descriptions-item>
         <el-descriptions-item label="使用场景" :span="2">{{ currentRow.usageScenario || '-' }}</el-descriptions-item>

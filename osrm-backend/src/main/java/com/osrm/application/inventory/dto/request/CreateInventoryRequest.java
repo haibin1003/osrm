@@ -24,6 +24,8 @@ public class CreateInventoryRequest {
 
     private Long businessSystemId;
 
+    private Long businessSystemApplicationId;
+
     @Size(max = 32, message = "部署环境长度不能超过32")
     private String deployEnvironment;
 
@@ -81,6 +83,14 @@ public class CreateInventoryRequest {
 
     public void setBusinessSystemId(Long businessSystemId) {
         this.businessSystemId = businessSystemId;
+    }
+
+    public Long getBusinessSystemApplicationId() {
+        return businessSystemApplicationId;
+    }
+
+    public void setBusinessSystemApplicationId(Long businessSystemApplicationId) {
+        this.businessSystemApplicationId = businessSystemApplicationId;
     }
 
     public String getDeployEnvironment() {

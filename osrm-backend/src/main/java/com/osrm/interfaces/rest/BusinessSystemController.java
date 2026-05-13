@@ -29,11 +29,10 @@ public class BusinessSystemController {
     @PreAuthorize("hasAuthority('business-system:read')")
     public ApiResponse<PageResult<BusinessSystemDTO>> list(
             @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) String domain,
             @RequestParam(required = false) Boolean enabled,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
-        PageResult<BusinessSystemDTO> result = businessSystemAppService.findByConditions(keyword, domain, enabled, page, size);
+        PageResult<BusinessSystemDTO> result = businessSystemAppService.findByConditions(keyword, enabled, page, size);
         return ApiResponse.success(result);
     }
 
@@ -83,9 +82,7 @@ public class BusinessSystemController {
     @GetMapping("/domains")
     @PreAuthorize("hasAuthority('business-system:read')")
     public ApiResponse<List<String>> getDomains() {
-        List<String> domains = businessSystemAppService.getAllDomains().stream()
-                .map(d -> d.getCode() + ":" + d.getName())
-                .toList();
+        List<String> domains = businessSystemAppService.getAllDomainL1();
         return ApiResponse.success(domains);
     }
 }

@@ -43,6 +43,16 @@
             </el-select>
           </div>
 
+          <div class="filter-group">
+            <label>显示全部节点</label>
+            <el-switch
+              v-model="filters.showAll"
+              active-text="是"
+              inactive-text="否"
+              @change="loadGraph"
+            />
+          </div>
+
           <el-button type="primary" @click="resetFilters" style="width: 100%">
             <el-icon><Refresh /></el-icon> 重置过滤器
           </el-button>
@@ -351,7 +361,8 @@ const graphData = reactive<RelationshipGraph>({
 const filters = reactive({
   domain: '',
   softwareType: '',
-  status: ''
+  status: '',
+  showAll: false
 })
 
 const viewMode = ref('global')
@@ -551,7 +562,8 @@ async function loadGraph() {
     const data = await trackingApi.getRelationshipGraph({
       domain: filters.domain || undefined,
       softwareType: filters.softwareType || undefined,
-      status: filters.status || undefined
+      status: filters.status || undefined,
+      showAll: filters.showAll || undefined
     })
     Object.assign(graphData, data)
   } catch (e) {
@@ -680,6 +692,7 @@ function resetFilters() {
   filters.domain = ''
   filters.softwareType = ''
   filters.status = ''
+  filters.showAll = false
   loadGraph()
 }
 

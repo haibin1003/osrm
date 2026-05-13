@@ -13,10 +13,14 @@ export interface InventoryRecord {
   responsiblePerson: string;
   businessSystemId?: number;
   businessSystemName?: string;
+  businessSystemApplicationId?: number;
+  businessSystemApplicationCode?: string;
+  businessSystemApplicationName?: string;
   deployEnvironment?: string;
   serverCount: number;
   usageScenario?: string;
   sourceType: string;
+  submitSource?: string;
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
   statusName: string;
   approvedBy?: number;
@@ -35,10 +39,28 @@ export interface InventoryForm {
   softwareType?: string;
   responsiblePerson?: string;
   businessSystemId?: number;
+  businessSystemApplicationId?: number;
   deployEnvironment?: string;
   serverCount: number;
   usageScenario?: string;
   remarks?: string;
+}
+
+export interface SoftwareEntry {
+  packageId?: number
+  packageName: string
+  versionNo?: string
+  softwareType?: string
+  deployEnvironment?: string
+  serverCount?: number
+  usageScenario?: string
+  remarks?: string
+}
+
+export interface BatchCreateRequest {
+  businessSystemId: number
+  businessSystemApplicationId?: number
+  softwareEntries: SoftwareEntry[]
 }
 
 export interface InventorySettings {
@@ -78,7 +100,12 @@ export const inventoryApi = {
     return request.get<InventoryRecord>(`/v1/inventory/${id}`);
   },
 
-  // 创建登记
+  // 批量创建登记
+  batchCreate(data: BatchCreateRequest) {
+    return request.post<InventoryRecord[]>('/v1/inventory/batch', data);
+  },
+
+  // 创建登记（单条，兼容旧逻辑）
   create(data: InventoryForm) {
     return request.post<InventoryRecord>('/v1/inventory', data);
   },

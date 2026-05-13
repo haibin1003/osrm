@@ -19,6 +19,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByUsernameAndEnabledTrue(String username);
 
+    Optional<User> findByRealNameAndPhone(String realName, String phone);
+
     @Query("SELECT u FROM User u WHERE " +
            "(:username IS NULL OR u.username LIKE %:username%) AND " +
            "(:realName IS NULL OR u.realName LIKE %:realName%) AND " +

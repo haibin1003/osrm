@@ -1,5 +1,6 @@
 package com.osrm.interfaces.rest;
 
+import com.osrm.application.inventory.dto.request.BatchCreateInventoryRequest;
 import com.osrm.application.inventory.dto.request.CreateInventoryRequest;
 import com.osrm.application.inventory.dto.request.RejectInventoryRequest;
 import com.osrm.application.inventory.dto.response.InventoryDTO;
@@ -18,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -107,6 +109,21 @@ public class InventoryController {
         String username = getCurrentUsername();
         InventoryDTO dto = inventoryAppService.createInventory(request, userId, username);
         return ApiResponse.success(dto);
+    }
+
+    /**
+     * 批量创建存量登记 — 一个系统一次提交多个软件
+     */
+    @PostMapping("/batch")
+    @PreAuthorize("hasAuthority('inventory:create')")
+    public ApiResponse<List<InventoryDTO>> batchCreate(
+            @Valid @RequestBody BatchCreateInventoryRequest request,
+            @CurrentUser Long userId) {
+        logger.info("批量创建存量登记: userId={}, businessSystemId={}, entries={}",
+                userId, request.getBusinessSystemId(), request.getSoftwareEntries().size());
+        String username = getCurrentUsername();
+        List<InventoryDTO> dtos = inventoryAppService.batchCreateInventory(request, userId, username);
+        return ApiResponse.success(dtos);
     }
 
     /**

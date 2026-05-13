@@ -5,7 +5,6 @@ import com.osrm.application.business.dto.request.UpdateBusinessSystemRequest;
 import com.osrm.application.business.dto.response.BusinessSystemDTO;
 import com.osrm.common.exception.BizException;
 import com.osrm.common.model.PageResult;
-import com.osrm.domain.business.entity.BusinessDomain;
 import com.osrm.domain.business.entity.BusinessSystem;
 import com.osrm.domain.business.repository.BusinessSystemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,10 +32,9 @@ public class BusinessSystemAppService {
     /**
      * 分页查询业务系统
      */
-    public PageResult<BusinessSystemDTO> findByConditions(String keyword, String domain, Boolean enabled, int page, int size) {
+    public PageResult<BusinessSystemDTO> findByConditions(String keyword, Boolean enabled, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        BusinessDomain domainEnum = domain != null && !domain.isEmpty() ? BusinessDomain.valueOf(domain) : null;
-        Page<BusinessSystem> pageResult = businessSystemRepository.findByConditions(keyword, domainEnum, enabled, pageable);
+        Page<BusinessSystem> pageResult = businessSystemRepository.findByConditions(keyword, null, enabled, pageable);
         List<BusinessSystemDTO> content = pageResult.getContent().stream()
                 .map(BusinessSystemDTO::from)
                 .collect(Collectors.toList());
@@ -68,7 +65,9 @@ public class BusinessSystemAppService {
         BusinessSystem system = new BusinessSystem();
         system.setSystemCode(request.getSystemCode());
         system.setSystemName(request.getSystemName());
-        system.setDomain(request.getDomain());
+        system.setDomainL1(request.getDomainL1());
+        system.setDomainL2(request.getDomainL2());
+        system.setDomainL3(request.getDomainL3());
         system.setResponsiblePerson(request.getResponsiblePerson());
         system.setDescription(request.getDescription());
         system.setCreatedBy(createdBy);
@@ -95,7 +94,9 @@ public class BusinessSystemAppService {
                 });
 
         system.setSystemName(request.getSystemName());
-        system.setDomain(request.getDomain());
+        system.setDomainL1(request.getDomainL1());
+        system.setDomainL2(request.getDomainL2());
+        system.setDomainL3(request.getDomainL3());
         system.setResponsiblePerson(request.getResponsiblePerson());
         system.setDescription(request.getDescription());
 
@@ -137,9 +138,9 @@ public class BusinessSystemAppService {
     }
 
     /**
-     * 获取所有业务域
+     * 获取所有一级域列表
      */
-    public List<BusinessDomain> getAllDomains() {
-        return Arrays.asList(BusinessDomain.values());
+    public List<String> getAllDomainL1() {
+        return businessSystemRepository.findDistinctDomainL1();
     }
 }

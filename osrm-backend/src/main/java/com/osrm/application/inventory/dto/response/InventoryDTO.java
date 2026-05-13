@@ -20,10 +20,14 @@ public class InventoryDTO {
     private String responsiblePerson;
     private Long businessSystemId;
     private String businessSystemName;
+    private Long businessSystemApplicationId;
+    private String businessSystemApplicationCode;
+    private String businessSystemApplicationName;
     private String deployEnvironment;
     private Integer serverCount;
     private String usageScenario;
     private String sourceType;
+    private String submitSource;
     private String status;
     private String statusName;
     private Long approvedBy;
@@ -48,10 +52,16 @@ public class InventoryDTO {
         if (record.getBusinessSystem() != null) {
             dto.setBusinessSystemName(record.getBusinessSystem().getSystemName());
         }
+        dto.setBusinessSystemApplicationId(record.getBusinessSystemApplicationId());
+        if (record.getBusinessSystemApplication() != null) {
+            dto.setBusinessSystemApplicationCode(record.getBusinessSystemApplication().getApplicationCode());
+            dto.setBusinessSystemApplicationName(record.getBusinessSystemApplication().getApplicationName());
+        }
         dto.setDeployEnvironment(record.getDeployEnvironment());
         dto.setServerCount(record.getServerCount());
         dto.setUsageScenario(record.getUsageScenario());
         dto.setSourceType(record.getSourceType() != null ? record.getSourceType().name() : null);
+        dto.setSubmitSource(record.getSubmitSource() != null ? record.getSubmitSource().name() : null);
         dto.setStatus(record.getStatus() != null ? record.getStatus().name() : null);
         dto.setStatusName(record.getStatus() != null ? record.getStatus().getName() : null);
         dto.setApprovedBy(record.getApprovedBy());
@@ -97,6 +107,15 @@ public class InventoryDTO {
     public String getBusinessSystemName() { return businessSystemName; }
     public void setBusinessSystemName(String businessSystemName) { this.businessSystemName = businessSystemName; }
 
+    public Long getBusinessSystemApplicationId() { return businessSystemApplicationId; }
+    public void setBusinessSystemApplicationId(Long businessSystemApplicationId) { this.businessSystemApplicationId = businessSystemApplicationId; }
+
+    public String getBusinessSystemApplicationCode() { return businessSystemApplicationCode; }
+    public void setBusinessSystemApplicationCode(String businessSystemApplicationCode) { this.businessSystemApplicationCode = businessSystemApplicationCode; }
+
+    public String getBusinessSystemApplicationName() { return businessSystemApplicationName; }
+    public void setBusinessSystemApplicationName(String businessSystemApplicationName) { this.businessSystemApplicationName = businessSystemApplicationName; }
+
     public String getDeployEnvironment() { return deployEnvironment; }
     public void setDeployEnvironment(String deployEnvironment) { this.deployEnvironment = deployEnvironment; }
 
@@ -108,6 +127,9 @@ public class InventoryDTO {
 
     public String getSourceType() { return sourceType; }
     public void setSourceType(String sourceType) { this.sourceType = sourceType; }
+
+    public String getSubmitSource() { return submitSource; }
+    public void setSubmitSource(String submitSource) { this.submitSource = submitSource; }
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }

@@ -1,6 +1,5 @@
 package com.osrm.infrastructure.config;
 
-import com.osrm.domain.business.entity.BusinessDomain;
 import com.osrm.domain.business.entity.BusinessSystem;
 import com.osrm.domain.business.repository.BusinessSystemRepository;
 import com.osrm.domain.software.entity.PackageStatus;
@@ -281,7 +280,7 @@ public class DataInitializer implements CommandLineRunner {
             BusinessSystem bs = new BusinessSystem();
             bs.setSystemCode("SYS-OA");
             bs.setSystemName("办公自动化系统");
-            bs.setDomain(BusinessDomain.BUSINESS);
+            bs.setDomainL1("业务域");
             bs.setResponsiblePerson("张三");
             bs.setDescription("企业内部 OA 系统");
             bs.setEnabled(true);
@@ -291,7 +290,7 @@ public class DataInitializer implements CommandLineRunner {
             BusinessSystem bs2 = new BusinessSystem();
             bs2.setSystemCode("SYS-ERP");
             bs2.setSystemName("ERP 系统");
-            bs2.setDomain(BusinessDomain.BUSINESS);
+            bs2.setDomainL1("业务域");
             bs2.setResponsiblePerson("李四");
             bs2.setDescription("企业资源规划系统");
             bs2.setEnabled(true);

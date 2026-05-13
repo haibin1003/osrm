@@ -1,12 +1,17 @@
-export type BusinessDomain = 'BUSINESS' | 'OPERATION' | 'RESOURCE' | 'SERVICE' | 'DATA';
-
 export interface BusinessSystem {
   id: number;
   systemCode: string;
   systemName: string;
-  domain: BusinessDomain;
-  domainName: string;
+  systemAlias?: string;
+  unit?: string;
+  category?: string;
+  domainL1?: string;
+  domainL2?: string;
+  domainL3?: string;
+  status?: string;
+  statusName?: string;
   responsiblePerson?: string;
+  responsibleDept?: string;
   description?: string;
   enabled: boolean;
   createdBy?: number;
@@ -17,7 +22,9 @@ export interface BusinessSystem {
 export interface BusinessSystemForm {
   systemCode: string;
   systemName: string;
-  domain: BusinessDomain;
+  domainL1?: string;
+  domainL2?: string;
+  domainL3?: string;
   responsiblePerson?: string;
   description?: string;
 }

@@ -31,8 +31,9 @@ public class RelationshipGraphController {
     public ApiResponse<RelationshipGraphDTO> getRelationshipGraph(
             @RequestParam(required = false) String domain,
             @RequestParam(required = false) String softwareType,
-            @RequestParam(required = false) String status) {
-        return ApiResponse.success(graphAppService.buildRelationshipGraph(domain, softwareType, status));
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false, defaultValue = "false") boolean showAll) {
+        return ApiResponse.success(graphAppService.buildRelationshipGraph(domain, softwareType, status, showAll));
     }
 
     /**

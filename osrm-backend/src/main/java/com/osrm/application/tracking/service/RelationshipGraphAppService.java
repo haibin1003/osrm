@@ -50,14 +50,14 @@ public class RelationshipGraphAppService {
      * 构建完整的系统-软件关联图
      * 同时包含订阅关系和存量上报数据
      */
-    public RelationshipGraphDTO buildRelationshipGraph(String domain, String softwareType, String status) {
+    public RelationshipGraphDTO buildRelationshipGraph(String domain, String softwareType, String status, boolean showAll) {
         // 获取所有启用的业务系统
         List<BusinessSystem> systems = businessSystemRepository.findByEnabled(true);
 
         // 按业务域过滤
         if (domain != null && !domain.isEmpty()) {
             systems = systems.stream()
-                    .filter(s -> s.getDomain() != null && s.getDomain().name().equals(domain))
+                    .filter(s -> s.getDomainL1() != null && s.getDomainL1().equals(domain))
                     .toList();
         }
 
@@ -121,12 +121,12 @@ public class RelationshipGraphAppService {
         Set<Long> allConnectedPackageIds = new HashSet<>(connectedPackageIdsFromSub);
         allConnectedPackageIds.addAll(connectedPackageIdsFromInv);
 
-        // 过滤出有关联的系统和软件包
-        List<BusinessSystem> filteredSystems = systems.stream()
+        // 过滤出有关联的系统和软件包（showAll=true 时显示全部）
+        List<BusinessSystem> filteredSystems = showAll ? systems : systems.stream()
                 .filter(s -> allConnectedSystemIds.contains(s.getId()))
                 .toList();
 
-        List<SoftwarePackage> filteredPackages = packages.stream()
+        List<SoftwarePackage> filteredPackages = showAll ? packages : packages.stream()
                 .filter(p -> allConnectedPackageIds.contains(p.getId()))
                 .toList();
 
@@ -140,7 +140,7 @@ public class RelationshipGraphAppService {
                     system.getSystemName(),
                     system.getId(),
                     system.getSystemCode(),
-                    system.getDomain() != null ? system.getDomain().name() : null,
+                    system.getDomainL1(),
                     system.getEnabled()
             ));
         }
@@ -282,7 +282,7 @@ public class RelationshipGraphAppService {
                 system.getSystemName(),
                 system.getId(),
                 system.getSystemCode(),
-                system.getDomain() != null ? system.getDomain().name() : null,
+                system.getDomainL1(),
                 system.getEnabled()
         ));
         result.setPackages(packages);
@@ -330,13 +330,13 @@ public class RelationshipGraphAppService {
                 info.setSystemId(system.getId());
                 info.setSystemName(system.getSystemName());
                 info.setSystemCode(system.getSystemCode());
-                info.setDomain(system.getDomain() != null ? system.getDomain().name() : null);
+                info.setDomain(system.getDomainL1());
                 info.setVersionNumber(verNo);
                 affectedSystems.add(info);
                 addedSystemIds.add(system.getId());
 
                 // 统计
-                String domain = system.getDomain() != null ? system.getDomain().name() : "UNKNOWN";
+                String domain = system.getDomainL1() != null ? system.getDomainL1() : "UNKNOWN";
                 byDomain.merge(domain, 1, Integer::sum);
 
                 String version = verNo != null ? verNo : "UNKNOWN";
@@ -353,13 +353,13 @@ public class RelationshipGraphAppService {
                     info.setSystemId(system.getId());
                     info.setSystemName(system.getSystemName());
                     info.setSystemCode(system.getSystemCode());
-                    info.setDomain(system.getDomain() != null ? system.getDomain().name() : null);
+                    info.setDomain(system.getDomainL1());
                     info.setVersionNumber(inv.getVersionNo());
                     affectedSystems.add(info);
                     addedSystemIds.add(system.getId());
 
                     // 统计
-                    String domain = system.getDomain() != null ? system.getDomain().name() : "UNKNOWN";
+                    String domain = system.getDomainL1() != null ? system.getDomainL1() : "UNKNOWN";
                     byDomain.merge(domain, 1, Integer::sum);
 
                     String version = inv.getVersionNo() != null ? inv.getVersionNo() : "UNKNOWN";

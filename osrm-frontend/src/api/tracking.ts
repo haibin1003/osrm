@@ -92,6 +92,7 @@ export interface GraphFilters {
   domain?: string;
   softwareType?: string;
   status?: string;
+  showAll?: boolean;
 }
 
 export const trackingApi = {

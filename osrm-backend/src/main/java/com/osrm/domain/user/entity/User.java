@@ -28,6 +28,12 @@ public class User {
     @Column(name = "phone", length = 20)
     private String phone;
 
+    @Column(name = "department", length = 64)
+    private String department;
+
+    @Column(name = "source", nullable = false, length = 20)
+    private String source = "INTERNAL";
+
     @Column(name = "bio", columnDefinition = "TEXT")
     private String bio;
 
@@ -89,6 +95,12 @@ public class User {
 
     public String getPhone() { return phone; }
     public void setPhone(String phone) { this.phone = phone; }
+
+    public String getDepartment() { return department; }
+    public void setDepartment(String department) { this.department = department; }
+
+    public String getSource() { return source; }
+    public void setSource(String source) { this.source = source; }
 
     public String getBio() { return bio; }
     public void setBio(String bio) { this.bio = bio; }

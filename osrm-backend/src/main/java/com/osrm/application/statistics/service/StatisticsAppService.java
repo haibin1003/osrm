@@ -233,7 +233,7 @@ public class StatisticsAppService {
                     systemId,
                     system.getSystemName(),
                     system.getSystemCode(),
-                    system.getDomain() != null ? system.getDomain().name() : null,
+                    system.getDomainL1(),
                     packageCount,
                     subscriptionCount,
                     percentage

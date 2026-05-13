@@ -61,7 +61,20 @@
           <el-table-column prop="userId" label="登记人ID" width="100" />
           <el-table-column prop="packageName" label="软件名称" />
           <el-table-column prop="versionNo" label="版本号" width="100" />
-          <el-table-column prop="businessSystemName" label="业务系统" width="120" />
+          <el-table-column label="系统/应用" min-width="160">
+            <template #default="{ row }">
+              <div>{{ row.businessSystemName || '-' }}</div>
+              <div v-if="row.businessSystemApplicationName" style="font-size: 12px; color: #909399">
+                {{ row.businessSystemApplicationName }}
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column prop="submitSource" label="来源" width="80">
+            <template #default="{ row }">
+              <el-tag v-if="row.submitSource === 'H5'" size="small" type="warning">H5</el-tag>
+              <el-tag v-else size="small" type="info">内部</el-tag>
+            </template>
+          </el-table-column>
           <el-table-column prop="status" label="状态" width="100">
             <template #default="{ row }">
               <el-tag :type="getStatusType(row.status)">{{ row.statusName }}</el-tag>

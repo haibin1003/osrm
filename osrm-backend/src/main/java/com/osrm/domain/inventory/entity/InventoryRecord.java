@@ -1,6 +1,7 @@
 package com.osrm.domain.inventory.entity;
 
 import com.osrm.domain.business.entity.BusinessSystem;
+import com.osrm.domain.business.entity.BusinessSystemApplication;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -47,6 +48,13 @@ public class InventoryRecord {
     @JoinColumn(name = "business_system_id", insertable = false, updatable = false)
     private BusinessSystem businessSystem;
 
+    @Column(name = "business_system_application_id")
+    private Long businessSystemApplicationId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "business_system_application_id", insertable = false, updatable = false)
+    private BusinessSystemApplication businessSystemApplication;
+
     @Column(name = "deploy_environment", length = 32)
     private String deployEnvironment;
 
@@ -59,6 +67,10 @@ public class InventoryRecord {
     @Enumerated(EnumType.STRING)
     @Column(name = "source_type", nullable = false, length = 20)
     private SourceType sourceType = SourceType.MANUAL;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "submit_source", nullable = false, length = 20)
+    private SubmitSource submitSource = SubmitSource.INTERNAL;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
@@ -92,6 +104,22 @@ public class InventoryRecord {
         private final String name;
 
         SourceType(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+    }
+
+    // 提交来源(渠道)枚举
+    public enum SubmitSource {
+        INTERNAL("内部页"),
+        H5("H5公开链接");
+
+        private final String name;
+
+        SubmitSource(String name) {
             this.name = name;
         }
 
@@ -216,6 +244,18 @@ public class InventoryRecord {
         return businessSystem;
     }
 
+    public Long getBusinessSystemApplicationId() {
+        return businessSystemApplicationId;
+    }
+
+    public void setBusinessSystemApplicationId(Long businessSystemApplicationId) {
+        this.businessSystemApplicationId = businessSystemApplicationId;
+    }
+
+    public BusinessSystemApplication getBusinessSystemApplication() {
+        return businessSystemApplication;
+    }
+
     public String getDeployEnvironment() {
         return deployEnvironment;
     }
@@ -246,6 +286,14 @@ public class InventoryRecord {
 
     public void setSourceType(SourceType sourceType) {
         this.sourceType = sourceType;
+    }
+
+    public SubmitSource getSubmitSource() {
+        return submitSource;
+    }
+
+    public void setSubmitSource(SubmitSource submitSource) {
+        this.submitSource = submitSource;
     }
 
     public InventoryStatus getStatus() {

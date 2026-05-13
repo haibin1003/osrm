@@ -14,16 +14,7 @@
     <div class="search-card content-card">
       <el-form :model="searchForm" inline>
         <el-form-item label="关键词">
-          <el-input v-model="searchForm.keyword" placeholder="系统编码/名称" clearable />
-        </el-form-item>
-        <el-form-item label="所属域">
-          <el-select v-model="searchForm.domain" placeholder="全部" clearable>
-            <el-option label="业务域" value="BUSINESS" />
-            <el-option label="运营域" value="OPERATION" />
-            <el-option label="资源域" value="RESOURCE" />
-            <el-option label="服务域" value="SERVICE" />
-            <el-option label="数据域" value="DATA" />
-          </el-select>
+          <el-input v-model="searchForm.keyword" placeholder="系统编码/名称/域" clearable />
         </el-form-item>
         <el-form-item label="状态">
           <el-select v-model="searchForm.enabled" placeholder="全部" clearable>
@@ -43,9 +34,12 @@
       <el-table v-loading="loading" :data="tableData">
         <el-table-column prop="systemCode" label="系统编码" min-width="120" />
         <el-table-column prop="systemName" label="系统名称" min-width="150" />
-        <el-table-column prop="domainName" label="所属域" width="100">
+        <el-table-column label="所属域" min-width="180">
           <template #default="{ row }">
-            <el-tag size="small">{{ row.domainName }}</el-tag>
+            <span v-if="row.domainL1 || row.domainL2 || row.domainL3">
+              {{ [row.domainL1, row.domainL2, row.domainL3].filter(Boolean).join(' / ') }}
+            </span>
+            <span v-else>-</span>
           </template>
         </el-table-column>
         <el-table-column prop="responsiblePerson" label="负责人" width="120" />
@@ -55,8 +49,9 @@
           </template>
         </el-table-column>
         <el-table-column prop="createdAt" label="创建时间" width="170" />
-        <el-table-column label="操作" width="200" fixed="right">
+        <el-table-column label="操作" width="260" fixed="right">
           <template #default="{ row }">
+            <el-button type="primary" link @click="$router.push('/catalog/systems/' + row.id)">查看详情</el-button>
             <el-button v-if="canUpdate" type="primary" link @click="showDialog('edit', row)">编辑</el-button>
             <el-button v-if="canUpdate" :type="row.enabled ? 'warning' : 'success'" link @click="handleToggleEnabled(row)">
               {{ row.enabled ? '停用' : '启用' }}
@@ -97,14 +92,14 @@
         <el-form-item label="系统名称" prop="systemName">
           <el-input v-model="formData.systemName" placeholder="请输入系统名称" />
         </el-form-item>
-        <el-form-item label="所属域" prop="domain">
-          <el-select v-model="formData.domain" placeholder="请选择" style="width: 100%">
-            <el-option label="业务域" value="BUSINESS" />
-            <el-option label="运营域" value="OPERATION" />
-            <el-option label="资源域" value="RESOURCE" />
-            <el-option label="服务域" value="SERVICE" />
-            <el-option label="数据域" value="DATA" />
-          </el-select>
+        <el-form-item label="一级域">
+          <el-input v-model="formData.domainL1" placeholder="一级域" />
+        </el-form-item>
+        <el-form-item label="二级域">
+          <el-input v-model="formData.domainL2" placeholder="二级域" />
+        </el-form-item>
+        <el-form-item label="三级域">
+          <el-input v-model="formData.domainL3" placeholder="三级域" />
         </el-form-item>
         <el-form-item label="负责人" prop="responsiblePerson">
           <el-input v-model="formData.responsiblePerson" placeholder="请输入负责人" />
@@ -145,20 +140,19 @@ const dialogMode = ref<'add' | 'edit'>('add')
 const editId = ref<number | null>(null)
 const formRef = ref<FormInstance>()
 
-const searchForm = reactive({ keyword: '', domain: '', enabled: null as boolean | null })
+const searchForm = reactive({ keyword: '', enabled: null as boolean | null })
 const pagination = reactive({ page: 1, size: 10, total: 0 })
-const formData = reactive<BusinessSystemForm>({ systemCode: '', systemName: '', domain: 'BUSINESS', responsiblePerson: '', description: '' })
+const formData = reactive<BusinessSystemForm>({ systemCode: '', systemName: '', domainL1: '', domainL2: '', domainL3: '', responsiblePerson: '', description: '' })
 
 const formRules: FormRules = {
   systemCode: [{ required: true, message: '请输入系统编码', trigger: 'blur' }, { pattern: /^[a-zA-Z0-9_-]+$/, message: '只支持字母、数字，下划线和连字符', trigger: 'blur' }],
-  systemName: [{ required: true, message: '请输入系统名称', trigger: 'blur' }],
-  domain: [{ required: true, message: '请选择所属域', trigger: 'change' }]
+  systemName: [{ required: true, message: '请输入系统名称', trigger: 'blur' }]
 }
 
 const loadData = async () => {
   loading.value = true
   try {
-    const res = await businessApi.list({ keyword: searchForm.keyword || undefined, domain: searchForm.domain || undefined, enabled: searchForm.enabled, page: pagination.page, size: pagination.size })
+    const res = await businessApi.list({ keyword: searchForm.keyword || undefined, enabled: searchForm.enabled, page: pagination.page, size: pagination.size })
     tableData.value = res.content
     pagination.total = res.totalElements
   } catch (e: any) {
@@ -169,14 +163,16 @@ const loadData = async () => {
 }
 
 const handleSearch = () => { pagination.page = 1; loadData() }
-const handleReset = () => { searchForm.keyword = ''; searchForm.domain = ''; searchForm.enabled = null; handleSearch() }
+const handleReset = () => { searchForm.keyword = ''; searchForm.enabled = null; handleSearch() }
 
 const showDialog = (mode: 'add' | 'edit', row?: BusinessSystem) => {
   dialogMode.value = mode
   if (mode === 'edit' && row) {
     editId.value = row.id
     formData.systemName = row.systemName
-    formData.domain = row.domain
+    formData.domainL1 = row.domainL1 || ''
+    formData.domainL2 = row.domainL2 || ''
+    formData.domainL3 = row.domainL3 || ''
     formData.responsiblePerson = row.responsiblePerson || ''
     formData.description = row.description || ''
   }
@@ -194,7 +190,7 @@ const handleSubmit = async () => {
       await businessApi.create(formData)
       ElMessage.success('创建成功')
     } else if (editId.value) {
-      await businessApi.update(editId.value, { systemName: formData.systemName, domain: formData.domain, responsiblePerson: formData.responsiblePerson, description: formData.description })
+      await businessApi.update(editId.value, { systemName: formData.systemName, domainL1: formData.domainL1, domainL2: formData.domainL2, domainL3: formData.domainL3, responsiblePerson: formData.responsiblePerson, description: formData.description })
       ElMessage.success('更新成功')
     }
     dialogVisible.value = false

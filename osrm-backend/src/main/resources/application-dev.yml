@@ -1,6 +1,6 @@
 # 开发环境配置
 server:
-  port: 8080
+  port: 8081
 
 spring:
   application:
@@ -36,7 +36,8 @@ spring:
   flyway:
     enabled: true
     baseline-on-migrate: true
-    locations: classpath:db/migration
+    baseline-version: 0
+    locations: classpath:db/migration,filesystem:../osrm-deploy/sql/flyway/baseline,filesystem:../osrm-deploy/sql/flyway/migration
 
 jwt:
   secret: dev-secret-key-for-jwt-signing-at-least-256-bits-long-change-in-production
